@@ -15,6 +15,7 @@
     .login-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     .login-card { width: 100%; max-width: 400px; border-radius: 16px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
     .navbar { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-bottom: 3px solid #f59e0b; }
+    .search-toolbar { background: #ffffff; border-bottom: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(15,23,42,0.04); }
     .kpi-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(15,23,42,0.05); transition: transform 0.15s; background: #fff; }
     .kpi-card:hover { transform: translateY(-2px); }
     .card-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(15,23,42,0.05); border: 1px solid #e2e8f0; }
@@ -23,7 +24,12 @@
     .badge-terima { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
     .matrix-table th { font-size: 0.78rem; text-transform: uppercase; background-color: #f8fafc; white-space: nowrap; }
     .matrix-table td { font-size: 0.85rem; }
+    .wh-link { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .wh-link:hover { color: #f59e0b !important; }
     .unit-chip { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .avail-badge { display: inline-flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 0.82rem; transition: all 0.15s; }
+    .avail-badge:hover { border-color: #2563eb; background: #eff6ff; }
+    .unit-lookup-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; max-height: 290px; overflow-y: auto; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 12px 28px rgba(0,0,0,0.15); }
 
     @media print {
       body * { visibility: hidden; }
@@ -72,7 +78,8 @@
 
   <!-- APLIKASI UTAMA -->
   <div id="appScreen" class="d-none">
-    <nav class="navbar navbar-dark shadow-sm no-print py-3 sticky-top">
+    <!-- TOP NAVBAR -->
+    <nav class="navbar navbar-dark shadow-sm no-print py-2.5 sticky-top">
       <div class="container-fluid px-4">
         <div class="d-flex align-items-center gap-3">
           <span class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0">
@@ -91,6 +98,118 @@
       </div>
     </nav>
 
+    <!-- TOOLBAR PENCARIAN UNIT & GUDANG -->
+    <div class="search-toolbar py-2.5 px-4 no-print">
+      <div class="container-fluid px-0">
+        <div class="row g-2 align-items-center">
+          <!-- Searching Unit -->
+          <div class="col-md-5 position-relative">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-primary text-white border-primary fw-semibold">
+                <i class="bi bi-upc-scan me-1"></i>Searching Unit
+              </span>
+              <input type="text" id="globalUnitSearch" class="form-control border-primary" placeholder="Ketik ID Unit (misal: RLP-158, BYD, Zebra) untuk cek lokasi..." onkeyup="handleGlobalUnitSearch()" onfocus="handleGlobalUnitSearch()">
+              <button class="btn btn-outline-secondary" type="button" onclick="clearUnitSearch()" title="Reset"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <!-- Hasil Dropdown Pencarian Unit -->
+            <div id="unitSearchResults" class="unit-lookup-dropdown d-none mt-1 p-2"></div>
+          </div>
+
+          <!-- Searching Gudang -->
+          <div class="col-md-4">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-dark text-warning border-dark fw-semibold">
+                <i class="bi bi-building me-1"></i>Searching Gudang
+              </span>
+              <select id="globalWarehouseSelect" class="form-select border-dark fw-semibold" onchange="onGlobalWarehouseChange()">
+                <option value="">-- Pilih Gudang untuk Buka Detail --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tombol Buka Slide Bar Summary Gudang -->
+          <div class="col-md-3 text-md-end">
+            <button class="btn btn-primary btn-sm w-100 w-md-auto fw-bold" onclick="openWarehouseSidebar()">
+              <i class="bi bi-layout-sidebar-inset-reverse me-1"></i>Summary & Unit per Gudang
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE-OVER SIDEBAR: SUMMARY & AVAILABLE UNIT PER GUDANG -->
+    <div class="offcanvas offcanvas-end no-print" tabindex="-1" id="warehouseSidebar" style="width: 480px; max-width: 95vw;">
+      <div class="offcanvas-header bg-dark text-white border-bottom border-warning border-3">
+        <div>
+          <h5 class="offcanvas-title fw-bold mb-0"><i class="bi bi-building-check text-warning me-2"></i>Summary Gudang MHE</h5>
+          <small class="text-light opacity-75">Cek stok aktual & ID unit tersedia per lokasi</small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body bg-light">
+        <!-- Selector Gudang di dalam Sidebar -->
+        <div class="card border-0 shadow-sm p-3 mb-3">
+          <label class="form-label fw-bold small text-muted mb-1">PILIH LOKASI GUDANG</label>
+          <select id="sidebarWarehouseSelect" class="form-select fw-bold border-primary" onchange="renderSidebarContent()"></select>
+        </div>
+
+        <!-- Ringkasan Angka Gudang Terpilih -->
+        <div class="row g-2 mb-3">
+          <div class="col-4">
+            <div class="bg-white p-2.5 rounded border text-center">
+              <small class="text-muted d-block" style="font-size:0.7rem;">STANDBY</small>
+              <span class="fs-5 fw-bold text-success" id="sbStandbyCount">0</span>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-white p-2.5 rounded border text-center">
+              <small class="text-muted d-block" style="font-size:0.7rem;">IN-TRANSIT</small>
+              <span class="fs-5 fw-bold text-warning" id="sbTransitCount">0</span>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-white p-2.5 rounded border text-center">
+              <small class="text-muted d-block" style="font-size:0.7rem;">JENIS MHE</small>
+              <span class="fs-5 fw-bold text-primary" id="sbTypeCount">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabel Rekap Kategori di Gudang Ini -->
+        <div class="card border-0 shadow-sm p-3 mb-3">
+          <h6 class="fw-bold small text-uppercase text-primary mb-2"><i class="bi bi-list-check me-1"></i>Rekap Stok per Jenis MHE</h6>
+          <div class="table-responsive" style="max-height: 180px;">
+            <table class="table table-sm table-hover align-middle mb-0" style="font-size: 0.83rem;">
+              <thead class="table-light">
+                <tr><th>Jenis MHE</th><th class="text-center">Standby</th><th class="text-center">Transit</th></tr>
+              </thead>
+              <tbody id="sbCategoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Daftar Kode Unit yang Available di Gudang Ini -->
+        <div class="card border-0 shadow-sm p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold small text-uppercase text-success mb-0"><i class="bi bi-check-circle-fill me-1"></i>ID Code Unit Available</h6>
+            <span class="badge bg-success-subtle text-success border border-success-subtle" id="sbAvailBadge">0 unit</span>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <select id="sbFilterType" class="form-select form-select-sm" onchange="renderSidebarUnits()">
+                <option value="">Semua Jenis</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <input type="text" id="sbSearchCode" class="form-control form-control-sm" placeholder="Cari ID Unit..." onkeyup="renderSidebarUnits()">
+            </div>
+          </div>
+          <div id="sbUnitListContainer" class="d-flex flex-column gap-1.5" style="max-height: 310px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KONTEN UTAMA DASHBOARD -->
     <div class="container-fluid px-4 py-4 no-print">
       <!-- 6 KARTU KPI EXECUTIVE -->
       <div class="row g-3 mb-4">
@@ -180,7 +299,7 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
           <div>
             <span class="section-title"><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>SUMMARY MATRIX STOK MHE PER GUDANG (REAL-TIME)</span>
-            <p class="text-muted small mb-0">Kalkulasi otomatis dari tab Opening Stock + mutasi penerimaan terakhir (tidak termasuk unit In-Transit).</p>
+            <p class="text-muted small mb-0">Klik nama gudang pada header kolom untuk membuka Slide Bar rincian unit yang available.</p>
           </div>
           <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">Live Sync Spreadsheet</span>
         </div>
@@ -193,7 +312,7 @@
         </div>
       </div>
 
-      <!-- TABEL RIWAYAT MUTASI & DOKUMEN PDF PENGIRIMAN / PENERIMAAN -->
+      <!-- TABEL RIWAYAT MUTASI & DOKUMEN PDF -->
       <div class="card-box">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
           <span class="section-title"><i class="bi bi-journal-text me-2 text-primary"></i>Log Mutasi & Arsip Dokumen PDF SJMHE</span>
@@ -422,16 +541,24 @@
     let appState = { warehouses: [], mheTypes: [], masterData: [], unitInventory: [], transactions: [] };
     let currentUser = null;
     let selectedCodes = [];
-    let txModalObj, printModalObj, whChartInstance, catChartInstance;
+    let txModalObj, printModalObj, sidebarObj, whChartInstance, catChartInstance;
 
     document.addEventListener('DOMContentLoaded', () => {
       txModalObj = new bootstrap.Modal(document.getElementById('txModal'));
       printModalObj = new bootstrap.Modal(document.getElementById('printModal'));
+      sidebarObj = new bootstrap.Offcanvas(document.getElementById('warehouseSidebar'));
 
       setInterval(() => {
         const el = document.getElementById('liveClock');
         if (el) el.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
       }, 1000);
+
+      // Tutup dropdown hasil searching unit jika klik di luar area
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#globalUnitSearch') && !e.target.closest('#unitSearchResults')) {
+          document.getElementById('unitSearchResults').classList.add('d-none');
+        }
+      });
 
       const savedSession = sessionStorage.getItem('mhe_auth');
       if (savedSession) {
@@ -509,12 +636,169 @@
       document.getElementById('pengirim').innerHTML = whOpts;
       document.getElementById('penerima').innerHTML = whOpts;
       document.getElementById('filterWarehouse').innerHTML = `<option value="">Semua Gudang</option>` + whOpts;
+      document.getElementById('globalWarehouseSelect').innerHTML = `<option value="">-- Pilih Gudang (Semua Lokasi) --</option>` + whOpts;
+      document.getElementById('sidebarWarehouseSelect').innerHTML = whOpts;
 
       const typeOpts = `<option value="">-- Semua Jenis MHE di Gudang Ini --</option>` +
         appState.mheTypes.map(m => `<option value="${m}">${m}</option>`).join('');
       document.getElementById('jenisMhe').innerHTML = typeOpts;
+      document.getElementById('sbFilterType').innerHTML = `<option value="">Semua Jenis MHE</option>` +
+        appState.mheTypes.map(m => `<option value="${m}">${m}</option>`).join('');
     }
 
+    // =========================================================
+    // FITUR TOOLBAR 1: SEARCHING UNIT GLOBAL (CEK LOKASI UNIT)
+    // =========================================================
+    function handleGlobalUnitSearch() {
+      const q = document.getElementById('globalUnitSearch').value.trim().toLowerCase();
+      const box = document.getElementById('unitSearchResults');
+      if (!q) {
+        box.classList.add('d-none');
+        return;
+      }
+
+      const matches = (appState.unitInventory || []).filter(u =>
+        u.kode.toLowerCase().includes(q) || u.jenis.toLowerCase().includes(q) || u.currentWarehouse.toLowerCase().includes(q)
+      ).slice(0, 20);
+
+      if (!matches.length) {
+        box.innerHTML = `<div class="text-muted small p-2 text-center">Unit "${q}" tidak ditemukan.</div>`;
+        box.classList.remove('d-none');
+        return;
+      }
+
+      box.innerHTML = matches.map(u => {
+        const statusBadge = u.inTransit
+          ? `<span class="badge bg-warning text-dark">In-Transit (${u.lastSjmhe})</span>`
+          : `<span class="badge bg-success">Standby</span>`;
+        return `
+          <div class="d-flex justify-content-between align-items-center p-2 border-bottom hover-bg-light" style="cursor:pointer;" onclick="openWarehouseSidebar('${u.currentWarehouse}', '${u.kode}')">
+            <div>
+              <div class="fw-bold text-primary small">${u.kode} <span class="text-dark fw-normal">- ${u.jenis}</span></div>
+              <small class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Lokasi: <strong>${u.currentWarehouse}</strong></small>
+            </div>
+            <div class="text-end">
+              ${statusBadge}
+              <div style="font-size:0.7rem;" class="text-primary mt-0.5">Lihat Gudang &rarr;</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      box.classList.remove('d-none');
+    }
+
+    function clearUnitSearch() {
+      document.getElementById('globalUnitSearch').value = '';
+      document.getElementById('unitSearchResults').classList.add('d-none');
+    }
+
+    // =========================================================
+    // FITUR TOOLBAR 2 & SLIDE BAR: SUMMARY PER GUDANG
+    // =========================================================
+    function onGlobalWarehouseChange() {
+      const wh = document.getElementById('globalWarehouseSelect').value;
+      document.getElementById('filterWarehouse').value = wh;
+      renderTransactions();
+      if (wh) {
+        openWarehouseSidebar(wh);
+      }
+    }
+
+    function openWarehouseSidebar(warehouseName, highlightCode = '') {
+      const targetWh = warehouseName || document.getElementById('globalWarehouseSelect').value || appState.warehouses[0];
+      if (!targetWh) return;
+
+      document.getElementById('sidebarWarehouseSelect').value = targetWh;
+      document.getElementById('globalWarehouseSelect').value = targetWh;
+      document.getElementById('sbSearchCode').value = highlightCode;
+      document.getElementById('sbFilterType').value = '';
+      document.getElementById('unitSearchResults').classList.add('d-none');
+
+      renderSidebarContent();
+      sidebarObj.show();
+    }
+
+    function renderSidebarContent() {
+      const wh = document.getElementById('sidebarWarehouseSelect').value;
+      const unitsInWh = (appState.unitInventory || []).filter(u => u.currentWarehouse === wh);
+
+      const standbyUnits = unitsInWh.filter(u => !u.inTransit);
+      const transitUnits = unitsInWh.filter(u => u.inTransit);
+
+      // Rekap per Jenis MHE di gudang ini
+      const typeMap = {};
+      unitsInWh.forEach(u => {
+        if (!typeMap[u.jenis]) typeMap[u.jenis] = { standby: 0, transit: 0 };
+        if (u.inTransit) typeMap[u.jenis].transit += (u.qty || 1);
+        else typeMap[u.jenis].standby += (u.qty || 1);
+      });
+
+      document.getElementById('sbStandbyCount').innerText = standbyUnits.reduce((s, u) => s + (u.qty || 1), 0);
+      document.getElementById('sbTransitCount').innerText = transitUnits.reduce((s, u) => s + (u.qty || 1), 0);
+      document.getElementById('sbTypeCount').innerText = Object.keys(typeMap).length;
+
+      const catBody = document.getElementById('sbCategoryBody');
+      const entries = Object.entries(typeMap).sort();
+      catBody.innerHTML = entries.length
+        ? entries.map(([jenis, cnt]) => `
+            <tr>
+              <td class="fw-semibold">${jenis}</td>
+              <td class="text-center fw-bold text-success">${cnt.standby}</td>
+              <td class="text-center text-warning fw-bold">${cnt.transit || '-'}</td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="3" class="text-center text-muted py-2">Tidak ada unit terdaftar di gudang ini.</td></tr>';
+
+      renderSidebarUnits();
+    }
+
+    function renderSidebarUnits() {
+      const wh = document.getElementById('sidebarWarehouseSelect').value;
+      const typeFilter = document.getElementById('sbFilterType').value;
+      const codeQuery = document.getElementById('sbSearchCode').value.trim().toLowerCase();
+
+      const availUnits = (appState.unitInventory || []).filter(u => {
+        return u.currentWarehouse === wh &&
+               !u.inTransit &&
+               (!typeFilter || u.jenis === typeFilter) &&
+               (!codeQuery || u.kode.toLowerCase().includes(codeQuery) || u.jenis.toLowerCase().includes(codeQuery));
+      }).sort((a, b) => a.kode.localeCompare(b.kode));
+
+      document.getElementById('sbAvailBadge').innerText = `${availUnits.length} unit`;
+      const container = document.getElementById('sbUnitListContainer');
+
+      if (!availUnits.length) {
+        container.innerHTML = '<div class="text-center text-muted small py-3">Tidak ada kode unit available yang cocok.</div>';
+        return;
+      }
+
+      container.innerHTML = availUnits.map(u => `
+        <div class="avail-badge">
+          <div>
+            <span class="fw-bold text-primary">${u.kode}</span>
+            <small class="text-muted d-block" style="font-size:0.74rem;">${u.jenis}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:0.75rem;" onclick="mutasiDariSidebar('${wh}', '${u.jenis}', '${u.kode}')">
+            Mutasi &rarr;
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function mutasiDariSidebar(wh, jenis, kode) {
+      sidebarObj.hide();
+      openFormModal();
+      document.getElementById('status').value = 'Pengiriman';
+      document.getElementById('pengirim').value = wh;
+      document.getElementById('jenisMhe').value = jenis;
+      selectedCodes = [kode];
+      renderSelectedChips();
+      filterAvailableUnits();
+    }
+
+    // =========================================================
+    // FORM DROPDOWN UNIT & DASHBOARD SUMMARY
+    // =========================================================
     function onWarehouseOrTypeChange() {
       selectedCodes = [];
       renderSelectedChips();
@@ -655,7 +939,7 @@
       document.getElementById('matrixHead').innerHTML = `
         <tr>
           <th>Jenis Material Handling Equipment (MHE)</th>
-          ${whList.map(w => `<th class="text-center">${w}</th>`).join('')}
+          ${whList.map(w => `<th class="text-center text-primary wh-link" onclick="openWarehouseSidebar('${w}')" title="Klik untuk lihat unit available di ${w}">${w}</th>`).join('')}
           <th class="text-center bg-primary text-white">Total Standby</th>
         </tr>
       `;
@@ -691,7 +975,16 @@
           labels: whList,
           datasets: [{ label: 'Unit Standby', data: whList.map(w => colTotals[w] || 0), backgroundColor: '#2563eb', borderRadius: 6 }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const idx = elements[0].index;
+              openWarehouseSidebar(whList[idx]);
+            }
+          }
+        }
       });
 
       const ctxCat = document.getElementById('categoryChart').getContext('2d');
