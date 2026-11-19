@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login - MHE Logistics Portal</title>
+  <title>MHE Logistics Control & Summary Portal</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -11,15 +11,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    body { background-color: #f0f2f5; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: #f1f5f9; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1e293b; }
     .login-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     .login-card { width: 100%; max-width: 400px; border-radius: 16px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-    .navbar { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-    .kpi-card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-    .card-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+    .navbar { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-bottom: 3px solid #f59e0b; }
+    .kpi-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(15,23,42,0.05); transition: transform 0.15s; background: #fff; }
+    .kpi-card:hover { transform: translateY(-2px); }
+    .card-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(15,23,42,0.05); border: 1px solid #e2e8f0; }
+    .section-title { font-size: 0.95rem; font-weight: 700; color: #0f172a; letter-spacing: 0.2px; }
     .badge-kirim { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
     .badge-terima { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    
+    .matrix-table th { font-size: 0.78rem; text-transform: uppercase; background-color: #f8fafc; white-space: nowrap; }
+    .matrix-table td { font-size: 0.85rem; }
+    .unit-chip { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
@@ -32,14 +37,15 @@
 </head>
 <body>
 
+  <!-- HALAMAN LOGIN -->
   <div id="loginScreen" class="login-wrapper px-3">
     <div class="card login-card p-4 bg-white">
       <div class="text-center mb-4">
-        <div class="bg-dark text-warning d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px;">
+        <div class="bg-dark text-warning d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px;">
           <i class="bi bi-shield-lock-fill fs-2"></i>
         </div>
         <h4 class="fw-bold mb-1">MHE LOGISTICS PORTAL</h4>
-        <p class="text-muted small mb-0">Silakan login untuk mengakses database MHE</p>
+        <p class="text-muted small mb-0">Warehouse Asset Control & Surat Jalan System</p>
       </div>
       <form onsubmit="handleLogin(event)">
         <div class="mb-3">
@@ -64,17 +70,21 @@
     </div>
   </div>
 
+  <!-- APLIKASI UTAMA -->
   <div id="appScreen" class="d-none">
-    <nav class="navbar navbar-dark shadow-sm no-print py-3">
+    <nav class="navbar navbar-dark shadow-sm no-print py-3 sticky-top">
       <div class="container-fluid px-4">
-        <span class="navbar-brand fw-bold d-flex align-items-center gap-2">
-          <i class="bi bi-box-seam-fill text-warning fs-4"></i>
-          <span>MHE CONTROL & SURAT JALAN</span>
-        </span>
+        <div class="d-flex align-items-center gap-3">
+          <span class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0">
+            <i class="bi bi-box-seam-fill text-warning fs-4"></i>
+            <span>MHE CONTROL & SURAT JALAN</span>
+          </span>
+          <span class="badge bg-dark border border-secondary text-light d-none d-md-inline" id="liveClock"></span>
+        </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-secondary me-2" id="userBadge"><i class="bi bi-person-circle me-1"></i>User</span>
-          <button class="btn btn-outline-light btn-sm" onclick="loadData()"><i class="bi bi-arrow-clockwise"></i></button>
-          <button class="btn btn-success btn-sm" id="btnExport" onclick="exportToExcel()"><i class="bi bi-file-earmark-excel me-1"></i>Excel</button>
+          <span class="badge bg-secondary me-1 py-2 px-3" id="userBadge"><i class="bi bi-person-circle me-1"></i>User</span>
+          <button class="btn btn-outline-light btn-sm" onclick="loadData()" title="Refresh Data"><i class="bi bi-arrow-clockwise"></i></button>
+          <button class="btn btn-success btn-sm" id="btnExport" onclick="exportToExcel()"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
           <button class="btn btn-warning btn-sm fw-bold" onclick="openFormModal()"><i class="bi bi-plus-lg me-1"></i>Input SJMHE</button>
           <button class="btn btn-outline-danger btn-sm" onclick="handleLogout()" title="Keluar"><i class="bi bi-box-arrow-right"></i></button>
         </div>
@@ -82,80 +92,139 @@
     </nav>
 
     <div class="container-fluid px-4 py-4 no-print">
+      <!-- 6 KARTU KPI EXECUTIVE -->
       <div class="row g-3 mb-4">
-        <div class="col-md-3">
-          <div class="card kpi-card p-3 border-start border-primary border-4">
-            <small class="text-muted fw-bold">TOTAL ASET MASTER</small>
-            <h2 class="mb-0 mt-1 fw-bold text-primary" id="kpiMaster">-</h2>
-            <small class="text-muted">Unit terdaftar di Master MHE</small>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card kpi-card p-3 border-start border-primary border-4 h-100">
+            <small class="text-muted fw-bold" style="font-size:0.72rem;">TOTAL OPENING STOCK</small>
+            <h3 class="mb-0 mt-1 fw-bold text-primary" id="kpiMaster">-</h3>
+            <small class="text-muted" style="font-size:0.75rem;">Total aset terdaftar</small>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card kpi-card p-3 border-start border-warning border-4">
-            <small class="text-muted fw-bold">IN-TRANSIT (OPEN)</small>
-            <h2 class="mb-0 mt-1 fw-bold text-warning" id="kpiTransit">-</h2>
-            <small class="text-muted">Dikirim belum ada penerimaan</small>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card kpi-card p-3 border-start border-success border-4 h-100">
+            <small class="text-muted fw-bold" style="font-size:0.72rem;">STANDBY DI GUDANG</small>
+            <h3 class="mb-0 mt-1 fw-bold text-success" id="kpiStandby">-</h3>
+            <small class="text-muted" style="font-size:0.75rem;">Tersedia untuk mutasi</small>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card kpi-card p-3 border-start border-success border-4">
-            <small class="text-muted fw-bold">SELESAI (COMPLETED)</small>
-            <h2 class="mb-0 mt-1 fw-bold text-success" id="kpiCompleted">-</h2>
-            <small class="text-muted">Pengiriman & penerimaan cocok</small>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card kpi-card p-3 border-start border-warning border-4 h-100">
+            <small class="text-muted fw-bold" style="font-size:0.72rem;">IN-TRANSIT (OPEN)</small>
+            <h3 class="mb-0 mt-1 fw-bold text-warning" id="kpiTransit">-</h3>
+            <small class="text-muted" style="font-size:0.75rem;">Unit belum diterima</small>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card kpi-card p-3 border-start border-info border-4">
-            <small class="text-muted fw-bold">TOTAL LOG TRANSAKSI</small>
-            <h2 class="mb-0 mt-1 fw-bold text-info" id="kpiTotalLog">-</h2>
-            <small class="text-muted">Total baris riwayat SJMHE</small>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card kpi-card p-3 border-start border-4 h-100" style="border-left-color:#0d9488 !important;">
+            <small class="text-muted fw-bold" style="font-size:0.72rem;">SJMHE SELESAI</small>
+            <h3 class="mb-0 mt-1 fw-bold" style="color:#0d9488;" id="kpiCompleted">-</h3>
+            <small class="text-muted" style="font-size:0.75rem;">Kirim & terima cocok</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card kpi-card p-3 border-start border-info border-4 h-100">
+            <small class="text-muted fw-bold" style="font-size:0.72rem;">DOKUMEN PDF LENGKAP</small>
+            <h3 class="mb-0 mt-1 fw-bold text-info" id="kpiPdfRate">-</h3>
+            <small class="text-muted" id="kpiPdfSub" style="font-size:0.75rem;">0 dari 0 transaksi</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card kpi-card p-3 border-start border-danger border-4 h-100">
+            <small class="text-muted fw-bold" style="font-size:0.72rem;">PENDING DOKUMEN PDF</small>
+            <h3 class="mb-0 mt-1 fw-bold text-danger" id="kpiMissingPdf">-</h3>
+            <small class="text-muted" style="font-size:0.75rem;">SJMHE tanpa file PDF</small>
           </div>
         </div>
       </div>
 
+      <!-- GRAFIK & ALERT IN-TRANSIT -->
       <div class="row g-4 mb-4">
-        <div class="col-lg-7">
-          <div class="card-box h-100">
-            <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Distribusi Unit MHE per Gudang (Master)</h6>
-            <canvas id="warehouseChart" height="120"></canvas>
-          </div>
-        </div>
         <div class="col-lg-5">
           <div class="card-box h-100">
-            <h6 class="fw-bold mb-3"><i class="bi bi-building me-2 text-primary"></i>Rincian Aset per Gudang</h6>
-            <div class="table-responsive" style="max-height: 240px;">
-              <table class="table table-sm table-hover align-middle mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="section-title"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Distribusi Stok per Gudang (Real-Time)</span>
+            </div>
+            <canvas id="warehouseChart" height="170"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <div class="card-box h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="section-title"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Proporsi Kategori MHE</span>
+            </div>
+            <canvas id="categoryChart" height="170"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card-box h-100 border-warning">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="section-title text-warning-emphasis"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>Monitoring In-Transit (Belum Diterima)</span>
+              <span class="badge bg-warning text-dark" id="badgeOpenCount">0 Open</span>
+            </div>
+            <p class="text-muted small mb-2">Klik <strong>Terima</strong> untuk konfirmasi penerimaan & upload PDF Penerimaan:</p>
+            <div class="table-responsive" style="max-height: 225px;">
+              <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.82rem;">
                 <thead class="table-light">
-                  <tr><th>Gudang</th><th>Jenis MHE</th><th class="text-end">Qty</th></tr>
+                  <tr><th>No. SJMHE</th><th>Rute</th><th>Unit</th><th>Aksi</th></tr>
                 </thead>
-                <tbody id="masterSummaryBody"></tbody>
+                <tbody id="openTransitBody"></tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- SUMMARY MATRIX LENGKAP -->
+      <div class="card-box mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+          <div>
+            <span class="section-title"><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>SUMMARY MATRIX STOK MHE PER GUDANG (REAL-TIME)</span>
+            <p class="text-muted small mb-0">Kalkulasi otomatis dari tab Opening Stock + mutasi penerimaan terakhir (tidak termasuk unit In-Transit).</p>
+          </div>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">Live Sync Spreadsheet</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle mb-0 matrix-table" id="summaryMatrixTable">
+            <thead id="matrixHead"></thead>
+            <tbody id="matrixBody"></tbody>
+            <tfoot id="matrixFoot" class="table-dark fw-bold"></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- TABEL RIWAYAT MUTASI & DOKUMEN PDF PENGIRIMAN / PENERIMAAN -->
       <div class="card-box">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-          <h6 class="fw-bold mb-0"><i class="bi bi-journal-text me-2 text-primary"></i>Riwayat Mutasi MHE</h6>
-          <div class="d-flex gap-2">
-            <select id="filterStatus" class="form-select form-select-sm" onchange="renderTransactions()">
+          <span class="section-title"><i class="bi bi-journal-text me-2 text-primary"></i>Log Mutasi & Arsip Dokumen PDF SJMHE</span>
+          <div class="d-flex flex-wrap gap-2">
+            <select id="filterWarehouse" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
+              <option value="">Semua Gudang</option>
+            </select>
+            <select id="filterStatus" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
               <option value="">Semua Status</option>
               <option value="Pengiriman">Pengiriman</option>
               <option value="Penerimaan">Penerimaan</option>
             </select>
-            <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari No SJMHE / Unit / PIC..." onkeyup="renderTransactions()">
+            <select id="filterPdf" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
+              <option value="">Semua Dokumen</option>
+              <option value="HAS_PDF">Sudah Upload PDF</option>
+              <option value="NO_PDF">Belum Upload PDF</option>
+            </select>
+            <input type="text" id="searchInput" class="form-control form-control-sm" style="width:220px;" placeholder="Cari SJMHE / Unit / PIC..." onkeyup="renderTransactions()">
           </div>
         </div>
         <div class="table-responsive">
-          <table class="table table-hover align-middle" style="font-size: 0.9rem;">
+          <table class="table table-hover align-middle" style="font-size: 0.88rem;">
             <thead class="table-light">
               <tr>
                 <th>No. SJMHE</th>
                 <th>Status</th>
                 <th>Rute Gudang</th>
-                <th>Unit MHE & Qty</th>
+                <th>Jenis & ID Code Unit</th>
                 <th>Checker & Waktu</th>
+                <th class="text-center">PDF Pengiriman</th>
+                <th class="text-center">PDF Penerimaan</th>
                 <th class="text-center">Aksi</th>
               </tr>
             </thead>
@@ -165,7 +234,7 @@
       </div>
     </div>
   </div>
-
+  <!-- MODAL INPUT / REVISI + UPLOAD PDF -->
   <div class="modal fade no-print" id="txModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -178,62 +247,89 @@
             <input type="hidden" id="rowIndex">
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label fw-bold">Nomor SJMHE</label>
+                <label class="form-label fw-bold small">Nomor SJMHE</label>
                 <div class="input-group">
                   <input type="text" class="form-control" id="noSjmhe" required>
                   <button class="btn btn-outline-secondary" type="button" onclick="generateAutoNumber()">Auto</button>
                 </div>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-bold">Status Transaksi</label>
-                <select class="form-select" id="status" required>
-                  <option value="Pengiriman">Pengiriman</option>
-                  <option value="Penerimaan">Penerimaan</option>
+                <label class="form-label fw-bold small">Status Transaksi</label>
+                <select class="form-select" id="status" required onchange="onWarehouseOrTypeChange()">
+                  <option value="Pengiriman">Pengiriman (Keluar dari Gudang Pengirim)</option>
+                  <option value="Penerimaan">Penerimaan (Masuk ke Gudang Penerima)</option>
                 </select>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-bold">Gudang Pengirim</label>
-                <select class="form-select" id="pengirim" required></select>
+                <label class="form-label fw-bold small">Gudang Pengirim</label>
+                <select class="form-select" id="pengirim" required onchange="onWarehouseOrTypeChange()"></select>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-bold">Gudang Penerima</label>
+                <label class="form-label fw-bold small">Gudang Penerima</label>
                 <select class="form-select" id="penerima" required></select>
               </div>
-              <div class="col-md-5">
-                <label class="form-label fw-bold">Jenis MHE</label>
-                <input class="form-control" list="mheList" id="jenisMhe" required>
-                <datalist id="mheList"></datalist>
-              </div>
-              <div class="col-md-5">
-                <label class="form-label fw-bold">Kode Unit / No. RLP</label>
-                <input type="text" class="form-control" id="kodeUnit" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label fw-bold">Qty</label>
-                <input type="number" class="form-control" id="qty" value="1" min="1" required>
+
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Filter Jenis MHE</label>
+                <select class="form-select" id="jenisMhe" required onchange="filterAvailableUnits()">
+                  <option value="">-- Semua Jenis MHE di Gudang Ini --</option>
+                </select>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-bold">Checker / PIC</label>
+                <label class="form-label fw-bold small d-flex justify-content-between">
+                  <span>Pilih ID Code Unit Tersedia di Gudang</span>
+                  <span class="badge bg-info text-dark" id="availUnitCount">0 unit</span>
+                </label>
+                <select class="form-select" id="unitPicker" onchange="addSelectedUnit()">
+                  <option value="">-- Pilih ID Unit di Gudang Ini --</option>
+                </select>
+              </div>
+
+              <div class="col-md-9">
+                <label class="form-label fw-bold small">Daftar ID Code Unit Terpilih</label>
+                <div id="selectedUnitsChips" class="d-flex flex-wrap gap-1 mb-2"></div>
+                <input type="text" class="form-control bg-light" id="kodeUnit" required placeholder="Pilih ID unit dari dropdown di atas...">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold small">Total Qty</label>
+                <input type="number" class="form-control fw-bold text-center" id="qty" value="1" min="1" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Checker / PIC</label>
                 <input type="text" class="form-control" id="checker" required>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-bold">No. Polisi / Driver</label>
-                <input type="text" class="form-control" id="driverInfo">
+                <label class="form-label fw-bold small">No. Polisi / Driver</label>
+                <input type="text" class="form-control" id="driverInfo" placeholder="Contoh: A 9511 U / Pak Budi">
               </div>
+
               <div class="col-12">
-                <label class="form-label fw-bold">Keterangan</label>
-                <input type="text" class="form-control" id="keterangan">
+                <div class="p-3 border rounded bg-light">
+                  <label class="form-label fw-bold small mb-1" id="pdfUploadLabel">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>Upload Dokumen PDF Surat Jalan (Maks. 5 MB)
+                  </label>
+                  <input type="file" class="form-control form-control-sm" id="pdfFileInput" accept=".pdf,image/*">
+                  <div class="form-text small" id="currentPdfNotice">Otomatis tersimpan ke Kolom M (PDF Pengiriman) atau Kolom N (PDF Penerimaan).</div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold small">Keterangan / Kondisi Unit</label>
+                <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Baik, lengkap">
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-primary fw-bold" id="btnSave">Simpan Data</button>
+            <button type="submit" class="btn btn-primary fw-bold" id="btnSave"><i class="bi bi-cloud-upload me-1"></i>Simpan & Upload</button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+  <!-- MODAL PRINT SURAT JALAN -->
   <div class="modal fade" id="printModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -323,13 +419,19 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwbB0SbHQ7MsTMxqC27O-W2j1smB5OeqNpUQ5wxJqlpVgVCe3kW-i_AwM_PQPej8Ovo/exec';
 
-    let appState = { warehouses: [], mheTypes: [], masterData: [], transactions: [] };
+    let appState = { warehouses: [], mheTypes: [], masterData: [], unitInventory: [], transactions: [] };
     let currentUser = null;
-    let txModalObj, printModalObj, chartInstance;
+    let selectedCodes = [];
+    let txModalObj, printModalObj, whChartInstance, catChartInstance;
 
     document.addEventListener('DOMContentLoaded', () => {
       txModalObj = new bootstrap.Modal(document.getElementById('txModal'));
       printModalObj = new bootstrap.Modal(document.getElementById('printModal'));
+
+      setInterval(() => {
+        const el = document.getElementById('liveClock');
+        if (el) el.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+      }, 1000);
 
       const savedSession = sessionStorage.getItem('mhe_auth');
       if (savedSession) {
@@ -382,7 +484,7 @@
         }
 
         populateDropdowns();
-        renderDashboard();
+        renderExecutiveDashboard();
         renderTransactions();
       } catch (err) {
         btn.disabled = false;
@@ -403,77 +505,245 @@
     }
 
     function populateDropdowns() {
-      document.getElementById('pengirim').innerHTML = appState.warehouses.map(w => `<option value="${w}">${w}</option>`).join('');
-      document.getElementById('penerima').innerHTML = appState.warehouses.map(w => `<option value="${w}">${w}</option>`).join('');
-      document.getElementById('mheList').innerHTML = appState.mheTypes.map(m => `<option value="${m}">`).join('');
+      const whOpts = appState.warehouses.map(w => `<option value="${w}">${w}</option>`).join('');
+      document.getElementById('pengirim').innerHTML = whOpts;
+      document.getElementById('penerima').innerHTML = whOpts;
+      document.getElementById('filterWarehouse').innerHTML = `<option value="">Semua Gudang</option>` + whOpts;
+
+      const typeOpts = `<option value="">-- Semua Jenis MHE di Gudang Ini --</option>` +
+        appState.mheTypes.map(m => `<option value="${m}">${m}</option>`).join('');
+      document.getElementById('jenisMhe').innerHTML = typeOpts;
     }
 
-    function renderDashboard() {
+    function onWarehouseOrTypeChange() {
+      selectedCodes = [];
+      renderSelectedChips();
+      filterAvailableUnits();
+      const st = document.getElementById('status').value;
+      document.getElementById('pdfUploadLabel').innerHTML = `<i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>Upload Dokumen PDF ${st} (Maks. 5 MB)`;
+    }
+
+    function filterAvailableUnits() {
+      const status = document.getElementById('status').value;
+      const whPengirim = document.getElementById('pengirim').value;
+      const selectedType = document.getElementById('jenisMhe').value;
+      const picker = document.getElementById('unitPicker');
+
+      const available = (appState.unitInventory || []).filter(u => {
+        const matchWh = u.currentWarehouse === whPengirim;
+        const matchTransit = (status === 'Pengiriman') ? !u.inTransit : u.inTransit;
+        const matchType = !selectedType || u.jenis === selectedType;
+        return matchWh && matchTransit && matchType;
+      }).sort((a, b) => a.kode.localeCompare(b.kode));
+
+      document.getElementById('availUnitCount').innerText = `${available.length} unit tersedia`;
+
+      if (!available.length) {
+        picker.innerHTML = `<option value="">-- Tidak ada unit tersedia di ${whPengirim} --</option>`;
+        return;
+      }
+
+      picker.innerHTML = `<option value="">-- Pilih ID Unit (${available.length} tersedia) --</option>` +
+        available.map(u => `<option value="${u.kode}" data-jenis="${u.jenis}">${u.kode} — ${u.jenis}</option>`).join('');
+    }
+
+    function addSelectedUnit() {
+      const picker = document.getElementById('unitPicker');
+      const code = picker.value;
+      if (!code) return;
+
+      const opt = picker.options[picker.selectedIndex];
+      const jenis = opt.getAttribute('data-jenis');
+      if (jenis && !document.getElementById('jenisMhe').value) {
+        document.getElementById('jenisMhe').value = jenis;
+      }
+
+      if (!selectedCodes.includes(code)) {
+        selectedCodes.push(code);
+        renderSelectedChips();
+      }
+      picker.value = '';
+    }
+
+    function removeSelectedUnit(code) {
+      selectedCodes = selectedCodes.filter(c => c !== code);
+      renderSelectedChips();
+    }
+
+    function renderSelectedChips() {
+      const container = document.getElementById('selectedUnitsChips');
+      container.innerHTML = selectedCodes.map(c =>
+        `<span class="unit-chip">${c} <i class="bi bi-x-circle-fill text-danger" style="cursor:pointer;" onclick="removeSelectedUnit('${c}')"></i></span>`
+      ).join('');
+      document.getElementById('kodeUnit').value = selectedCodes.join(', ');
+      if (selectedCodes.length > 0) {
+        document.getElementById('qty').value = selectedCodes.length;
+      }
+    }
+
+    function renderExecutiveDashboard() {
+      const inv = appState.unitInventory || [];
       const totalMaster = appState.masterData.reduce((acc, item) => acc + item.qty, 0);
+      const inTransitUnits = inv.filter(u => u.inTransit).length;
+      const standbyUnits = Math.max(0, totalMaster - inTransitUnits);
+
       document.getElementById('kpiMaster').innerText = totalMaster.toLocaleString('id-ID');
-      document.getElementById('kpiTotalLog').innerText = appState.transactions.length;
+      document.getElementById('kpiStandby').innerText = standbyUnits.toLocaleString('id-ID');
+      document.getElementById('kpiTransit').innerText = inTransitUnits.toLocaleString('id-ID');
 
       const sjMap = {};
+      let withPdf = 0;
       appState.transactions.forEach(tx => {
-        if (!sjMap[tx.noSjmhe]) sjMap[tx.noSjmhe] = { kirim: false, terima: false };
-        if (tx.status === 'Pengiriman') sjMap[tx.noSjmhe].kirim = true;
-        if (tx.status === 'Penerimaan') sjMap[tx.noSjmhe].terima = true;
+        if (tx.pdfKirim || tx.pdfTerima || tx.pdfUrl) withPdf++;
+        if (!sjMap[tx.noSjmhe]) sjMap[tx.noSjmhe] = { kirim: null, terima: null };
+        if (tx.status === 'Pengiriman') sjMap[tx.noSjmhe].kirim = tx;
+        if (tx.status === 'Penerimaan') sjMap[tx.noSjmhe].terima = tx;
       });
 
-      let inTransit = 0, completed = 0;
+      let completed = 0;
+      const openTransitList = [];
       Object.values(sjMap).forEach(st => {
         if (st.kirim && st.terima) completed++;
-        else if (st.kirim && !st.terima) inTransit++;
+        else if (st.kirim && !st.terima) openTransitList.push(st.kirim);
       });
 
-      document.getElementById('kpiTransit').innerText = inTransit;
+      const totalTx = appState.transactions.length;
+      const missingPdf = totalTx - withPdf;
+      const pdfPct = totalTx ? Math.round((withPdf / totalTx) * 100) : 0;
+
       document.getElementById('kpiCompleted').innerText = completed;
+      document.getElementById('kpiPdfRate').innerText = `${pdfPct}%`;
+      document.getElementById('kpiPdfSub').innerText = `${withPdf} dari ${totalTx} transaksi`;
+      document.getElementById('kpiMissingPdf').innerText = missingPdf;
+      document.getElementById('badgeOpenCount').innerText = `${openTransitList.length} Open`;
 
-      const grouped = {}, whTotals = {};
-      appState.masterData.forEach(item => {
-        const key = `${item.gudang}||${item.jenis}`;
-        grouped[key] = (grouped[key] || 0) + item.qty;
-        whTotals[item.gudang] = (whTotals[item.gudang] || 0) + item.qty;
+      const openBody = document.getElementById('openTransitBody');
+      if (!openTransitList.length) {
+        openBody.innerHTML = '<tr><td colspan="4" class="text-center text-success py-3"><i class="bi bi-check-circle me-1"></i>Semua mutasi sudah diterima!</td></tr>';
+      } else {
+        openBody.innerHTML = openTransitList.map(tx => `
+          <tr>
+            <td class="fw-bold text-primary">${tx.noSjmhe}</td>
+            <td>${tx.pengirim} &rarr; ${tx.penerima}</td>
+            <td><span class="badge bg-light text-dark border">${tx.kodeUnit}</span></td>
+            <td><button class="btn btn-xs btn-outline-success py-0 px-2" style="font-size:0.75rem;" onclick='quickReceive(${JSON.stringify(tx)})'>Terima</button></td>
+          </tr>
+        `).join('');
+      }
+
+      const whList = appState.warehouses;
+      const typeList = appState.mheTypes;
+      const matrix = {};
+      const colTotals = {};
+      const catTotals = {};
+      whList.forEach(w => { colTotals[w] = 0; });
+
+      typeList.forEach(t => {
+        matrix[t] = {};
+        catTotals[t] = 0;
+        whList.forEach(w => { matrix[t][w] = 0; });
       });
 
-      document.getElementById('masterSummaryBody').innerHTML = Object.entries(grouped).sort().map(([k, q]) => {
-        const [g, j] = k.split('||');
-        return `<tr><td class="fw-bold">${g}</td><td>${j}</td><td class="text-end fw-bold">${q}</td></tr>`;
+      inv.forEach(u => {
+        if (!u.inTransit && matrix[u.jenis] && matrix[u.jenis][u.currentWarehouse] !== undefined) {
+          matrix[u.jenis][u.currentWarehouse] += (u.qty || 1);
+          colTotals[u.currentWarehouse] += (u.qty || 1);
+          catTotals[u.jenis] += (u.qty || 1);
+        }
+      });
+
+      document.getElementById('matrixHead').innerHTML = `
+        <tr>
+          <th>Jenis Material Handling Equipment (MHE)</th>
+          ${whList.map(w => `<th class="text-center">${w}</th>`).join('')}
+          <th class="text-center bg-primary text-white">Total Standby</th>
+        </tr>
+      `;
+
+      document.getElementById('matrixBody').innerHTML = typeList.map(t => {
+        const rowSum = whList.reduce((sum, w) => sum + (matrix[t][w] || 0), 0);
+        return `
+          <tr>
+            <td class="fw-semibold">${t}</td>
+            ${whList.map(w => {
+              const val = matrix[t][w] || 0;
+              return `<td class="text-center ${val > 0 ? 'fw-bold text-dark' : 'text-muted'}">${val || '-'}</td>`;
+            }).join('')}
+            <td class="text-center fw-bold bg-light text-primary">${rowSum}</td>
+          </tr>
+        `;
       }).join('');
 
-      const ctx = document.getElementById('warehouseChart').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
-      chartInstance = new Chart(ctx, {
+      const grandTotal = whList.reduce((sum, w) => sum + (colTotals[w] || 0), 0);
+      document.getElementById('matrixFoot').innerHTML = `
+        <tr>
+          <td>TOTAL UNIT PER GUDANG</td>
+          ${whList.map(w => `<td class="text-center">${colTotals[w] || 0}</td>`).join('')}
+          <td class="text-center text-warning">${grandTotal}</td>
+        </tr>
+      `;
+
+      const ctxWh = document.getElementById('warehouseChart').getContext('2d');
+      if (whChartInstance) whChartInstance.destroy();
+      whChartInstance = new Chart(ctxWh, {
         type: 'bar',
         data: {
-          labels: Object.keys(whTotals),
-          datasets: [{ label: 'Total Unit', data: Object.values(whTotals), backgroundColor: '#2563eb', borderRadius: 6 }]
+          labels: whList,
+          datasets: [{ label: 'Unit Standby', data: whList.map(w => colTotals[w] || 0), backgroundColor: '#2563eb', borderRadius: 6 }]
         },
         options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+
+      const ctxCat = document.getElementById('categoryChart').getContext('2d');
+      if (catChartInstance) catChartInstance.destroy();
+      const nonZeroTypes = typeList.filter(t => catTotals[t] > 0);
+      catChartInstance = new Chart(ctxCat, {
+        type: 'doughnut',
+        data: {
+          labels: nonZeroTypes,
+          datasets: [{
+            data: nonZeroTypes.map(t => catTotals[t]),
+            backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#6366f1', '#ec4899', '#14b8a6', '#8b5cf6', '#f97316']
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
       });
     }
 
     function renderTransactions() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       const statusFilter = document.getElementById('filterStatus').value;
+      const whFilter = document.getElementById('filterWarehouse').value;
+      const pdfFilter = document.getElementById('filterPdf').value;
 
       const filtered = appState.transactions.filter(tx => {
+        const hasAnyPdf = !!(tx.pdfKirim || tx.pdfTerima || tx.pdfUrl);
         const matchStatus = !statusFilter || tx.status === statusFilter;
+        const matchWh = !whFilter || tx.pengirim === whFilter || tx.penerima === whFilter;
+        const matchPdf = !pdfFilter || (pdfFilter === 'HAS_PDF' ? hasAnyPdf : !hasAnyPdf);
         const matchText = !search || [tx.noSjmhe, tx.kodeUnit, tx.jenisMhe, tx.checker, tx.pengirim, tx.penerima]
           .some(v => String(v).toLowerCase().includes(search));
-        return matchStatus && matchText;
+        return matchStatus && matchWh && matchPdf && matchText;
       });
 
       const tbody = document.getElementById('txTableBody');
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data transaksi.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">Tidak ada data transaksi yang sesuai filter.</td></tr>';
         return;
       }
 
       tbody.innerHTML = filtered.map(tx => {
         const editBtn = currentUser.role === 'ADMIN'
-          ? `<button class="btn btn-sm btn-outline-primary" onclick='openEditModal(${JSON.stringify(tx)})' title="Revisi"><i class="bi bi-pencil-square"></i></button>`
+          ? `<button class="btn btn-sm btn-outline-primary" onclick='openEditModal(${JSON.stringify(tx)})' title="Revisi / Upload PDF"><i class="bi bi-pencil-square"></i></button>`
           : '';
+
+        const btnPdfKirim = tx.pdfKirim
+          ? `<a href="${tx.pdfKirim}" target="_blank" class="btn btn-sm btn-danger py-0 px-2"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF Kirim</a>`
+          : `<span class="text-muted small">-</span>`;
+
+        const btnPdfTerima = tx.pdfTerima
+          ? `<a href="${tx.pdfTerima}" target="_blank" class="btn btn-sm btn-success py-0 px-2"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF Terima</a>`
+          : `<span class="text-muted small">-</span>`;
 
         return `<tr>
           <td class="fw-bold text-primary">${tx.noSjmhe}</td>
@@ -481,6 +751,8 @@
           <td>${tx.pengirim} <i class="bi bi-arrow-right mx-1 text-muted"></i> ${tx.penerima}</td>
           <td><div class="fw-semibold">${tx.jenisMhe} (${tx.qty})</div><small class="text-muted">${tx.kodeUnit}</small></td>
           <td><div>${tx.checker}</div><small class="text-muted">${tx.timestamp}</small></td>
+          <td class="text-center">${btnPdfKirim}</td>
+          <td class="text-center">${btnPdfTerima}</td>
           <td class="text-center">
             <button class="btn btn-sm btn-outline-dark me-1" onclick='openPrintModal(${JSON.stringify(tx)})' title="Print SJ"><i class="bi bi-printer"></i></button>
             ${editBtn}
@@ -505,33 +777,83 @@
     function openFormModal() {
       document.getElementById('txForm').reset();
       document.getElementById('rowIndex').value = '';
+      document.getElementById('currentPdfNotice').innerText = 'Otomatis tersimpan ke Kolom M (PDF Pengiriman) atau Kolom N (PDF Penerimaan).';
       document.getElementById('checker').value = currentUser.nama;
-      document.getElementById('modalTitle').innerText = 'Input Transaksi MHE Baru';
+      document.getElementById('modalTitle').innerText = 'Input Transaksi SJMHE Baru';
+      selectedCodes = [];
+      renderSelectedChips();
       generateAutoNumber();
+      filterAvailableUnits();
       txModalObj.show();
+    }
+
+    function quickReceive(tx) {
+      openFormModal();
+      document.getElementById('modalTitle').innerText = `Konfirmasi Penerimaan: ${tx.noSjmhe}`;
+      document.getElementById('noSjmhe').value = tx.noSjmhe;
+      document.getElementById('status').value = 'Penerimaan';
+      document.getElementById('pengirim').value = tx.pengirim;
+      document.getElementById('penerima').value = tx.penerima;
+      document.getElementById('jenisMhe').value = tx.jenisMhe;
+      selectedCodes = String(tx.kodeUnit).split(',').map(s => s.trim()).filter(Boolean);
+      renderSelectedChips();
+      document.getElementById('qty').value = tx.qty;
+      document.getElementById('driverInfo').value = tx.driverInfo;
+      document.getElementById('pdfUploadLabel').innerHTML = `<i class="bi bi-file-earmark-pdf-fill text-success me-1"></i>Upload Dokumen PDF Penerimaan (Maks. 5 MB)`;
+      filterAvailableUnits();
     }
 
     function openEditModal(tx) {
       document.getElementById('rowIndex').value = tx.rowIndex;
-      document.getElementById('modalTitle').innerText = `Revisi Data: ${tx.noSjmhe}`;
+      const savedPdf = (tx.status === 'Penerimaan') ? tx.pdfTerima : tx.pdfKirim;
+      document.getElementById('currentPdfNotice').innerHTML = savedPdf
+        ? `Dokumen tersimpan: <a href="${savedPdf}" target="_blank">Buka PDF Saat Ini</a> (pilih file baru jika ingin mengganti).`
+        : 'Belum ada dokumen PDF terlampir untuk status ini.';
+      document.getElementById('modalTitle').innerText = `Revisi / Upload PDF: ${tx.noSjmhe}`;
       document.getElementById('noSjmhe').value = tx.noSjmhe;
       document.getElementById('status').value = tx.status;
       document.getElementById('pengirim').value = tx.pengirim;
       document.getElementById('penerima').value = tx.penerima;
       document.getElementById('jenisMhe').value = tx.jenisMhe;
-      document.getElementById('kodeUnit').value = tx.kodeUnit;
+      selectedCodes = String(tx.kodeUnit).split(',').map(s => s.trim()).filter(Boolean);
+      renderSelectedChips();
       document.getElementById('qty').value = tx.qty;
       document.getElementById('checker').value = tx.checker;
       document.getElementById('driverInfo').value = tx.driverInfo;
       document.getElementById('keterangan').value = tx.keterangan;
+      filterAvailableUnits();
       txModalObj.show();
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = err => reject(err);
+        reader.readAsDataURL(file);
+      });
     }
 
     async function submitTransaction(e) {
       e.preventDefault();
       const btn = document.getElementById('btnSave');
+      const fileInput = document.getElementById('pdfFileInput');
+      const file = fileInput.files[0];
+
+      if (file && file.size > 5 * 1024 * 1024) {
+        alert('Ukuran file maksimal 5 MB.');
+        return;
+      }
+
       btn.disabled = true;
-      btn.innerText = 'Menyimpan...';
+      btn.innerText = file ? 'Mengunggah PDF & Menyimpan...' : 'Menyimpan Data...';
+
+      let pdfBase64 = '', pdfFileName = '', pdfMimeType = '';
+      if (file) {
+        pdfBase64 = await readFileAsBase64(file);
+        pdfFileName = file.name;
+        pdfMimeType = file.type;
+      }
 
       const payload = {
         authUser: currentUser.username,
@@ -541,12 +863,15 @@
         status: document.getElementById('status').value,
         pengirim: document.getElementById('pengirim').value,
         penerima: document.getElementById('penerima').value,
-        jenisMhe: document.getElementById('jenisMhe').value,
+        jenisMhe: document.getElementById('jenisMhe').value || 'MHE Unit',
         kodeUnit: document.getElementById('kodeUnit').value,
         qty: document.getElementById('qty').value,
         checker: document.getElementById('checker').value,
         driverInfo: document.getElementById('driverInfo').value,
-        keterangan: document.getElementById('keterangan').value
+        keterangan: document.getElementById('keterangan').value,
+        pdfBase64,
+        pdfFileName,
+        pdfMimeType
       };
 
       await fetch(API_URL, {
@@ -557,9 +882,9 @@
       });
 
       btn.disabled = false;
-      btn.innerText = 'Simpan Data';
+      btn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Simpan & Upload';
       txModalObj.hide();
-      setTimeout(loadData, 1200);
+      setTimeout(loadData, 1800);
     }
 
     function openPrintModal(tx) {
@@ -587,12 +912,13 @@
         'Nomor SJMHE': t.noSjmhe, 'Timestamp': t.timestamp, 'Status': t.status,
         'Checker': t.checker, 'Pengirim': t.pengirim, 'Penerima': t.penerima,
         'Jenis MHE': t.jenisMhe, 'Kode Unit': t.kodeUnit, 'Qty': t.qty,
-        'No. Polisi / Driver': t.driverInfo, 'Keterangan': t.keterangan
+        'No. Polisi / Driver': t.driverInfo, 'Keterangan': t.keterangan,
+        'PDF Pengiriman': t.pdfKirim, 'PDF Penerimaan': t.pdfTerima
       }));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Transaksi_MHE');
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appState.masterData), 'Master_MHE');
-      XLSX.writeFile(wb, `MHE_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appState.unitInventory), 'Stok_Aktual_Unit');
+      XLSX.writeFile(wb, `MHE_Executive_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
   </script>
 </body>
