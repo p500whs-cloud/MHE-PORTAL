@@ -32,7 +32,6 @@
 </head>
 <body>
 
-  <!-- HALAMAN LOGIN (TAMPIL PERTAMA KALI) -->
   <div id="loginScreen" class="login-wrapper px-3">
     <div class="card login-card p-4 bg-white">
       <div class="text-center mb-4">
@@ -65,7 +64,6 @@
     </div>
   </div>
 
-  <!-- APLIKASI UTAMA (TERSEMBUNYI SEBELUM LOGIN) -->
   <div id="appScreen" class="d-none">
     <nav class="navbar navbar-dark shadow-sm no-print py-3">
       <div class="container-fluid px-4">
@@ -84,7 +82,6 @@
     </nav>
 
     <div class="container-fluid px-4 py-4 no-print">
-      <!-- KPI CARDS -->
       <div class="row g-3 mb-4">
         <div class="col-md-3">
           <div class="card kpi-card p-3 border-start border-primary border-4">
@@ -116,7 +113,6 @@
         </div>
       </div>
 
-      <!-- GRAFIK & REKAP GUDANG -->
       <div class="row g-4 mb-4">
         <div class="col-lg-7">
           <div class="card-box h-100">
@@ -139,7 +135,6 @@
         </div>
       </div>
 
-      <!-- TABEL LOG TRANSAKSI -->
       <div class="card-box">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
           <h6 class="fw-bold mb-0"><i class="bi bi-journal-text me-2 text-primary"></i>Riwayat Mutasi MHE</h6>
@@ -171,7 +166,6 @@
     </div>
   </div>
 
-  <!-- MODAL INPUT / REVISI -->
   <div class="modal fade no-print" id="txModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -240,8 +234,6 @@
       </div>
     </div>
   </div>
-
-  <!-- MODAL PRINT SURAT JALAN -->
   <div class="modal fade" id="printModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -252,4 +244,356 @@
         <div class="modal-body">
           <div id="printArea">
             <div class="sj-box">
-              <div class="d-flex justify-content-between align-items-center border-bottom border
+              <div class="d-flex justify-content-between align-items-center border-bottom border-2 border-dark pb-3 mb-3">
+                <div>
+                  <h4 class="fw-bold mb-0">SURAT JALAN MUTASI MHE</h4>
+                  <p class="mb-0 small">WAREHOUSE & LOGISTICS OPERATIONS</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="text-end">
+                    <h5 class="fw-bold mb-0" id="sjNo"></h5>
+                    <small id="sjDate"></small>
+                  </div>
+                  <div id="sjQrCode"></div>
+                </div>
+              </div>
+              <div class="row mb-3 small">
+                <div class="col-6">
+                  <table class="table table-borderless table-sm mb-0">
+                    <tr><td width="100"><strong>Pengirim</strong></td><td>: <span id="sjPengirim"></span></td></tr>
+                    <tr><td><strong>Penerima</strong></td><td>: <span id="sjPenerima"></span></td></tr>
+                  </table>
+                </div>
+                <div class="col-6">
+                  <table class="table table-borderless table-sm mb-0">
+                    <tr><td width="120"><strong>Status</strong></td><td>: <span id="sjStatus"></span></td></tr>
+                    <tr><td><strong>Kendaraan/Driver</strong></td><td>: <span id="sjDriver"></span></td></tr>
+                  </table>
+                </div>
+              </div>
+              <table class="table sj-table mb-4 small">
+                <thead>
+                  <tr class="table-light text-center">
+                    <th width="40">No</th>
+                    <th>Jenis MHE</th>
+                    <th>Kode Unit / Nomor RLP</th>
+                    <th width="70">Qty</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">1</td>
+                    <td id="sjJenis"></td>
+                    <td id="sjKode"></td>
+                    <td class="text-center fw-bold" id="sjQty"></td>
+                    <td id="sjKet"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="row text-center mt-5 pt-3 small">
+                <div class="col-4">
+                  <p class="mb-5">Diserahkan Oleh,</p>
+                  <p class="fw-bold mb-0 text-decoration-underline" id="sjPicPengirim"></p>
+                  <span>Checker Pengirim</span>
+                </div>
+                <div class="col-4">
+                  <p class="mb-5">Pembawa / Driver,</p>
+                  <p class="fw-bold mb-0">( ............................ )</p>
+                  <span>Ekspedisi</span>
+                </div>
+                <div class="col-4">
+                  <p class="mb-5">Diterima Oleh,</p>
+                  <p class="fw-bold mb-0">( ............................ )</p>
+                  <span>Checker Penerima</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer no-print">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+          <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print / PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwbB0SbHQ7MsTMxqC27O-W2j1smB5OeqNpUQ5wxJqlpVgVCe3kW-i_AwM_PQPej8Ovo/exec';
+
+    let appState = { warehouses: [], mheTypes: [], masterData: [], transactions: [] };
+    let currentUser = null;
+    let txModalObj, printModalObj, chartInstance;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      txModalObj = new bootstrap.Modal(document.getElementById('txModal'));
+      printModalObj = new bootstrap.Modal(document.getElementById('printModal'));
+
+      const savedSession = sessionStorage.getItem('mhe_auth');
+      if (savedSession) {
+        const creds = JSON.parse(savedSession);
+        authenticateAndLoad(creds.user, creds.pass, true);
+      }
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+      await authenticateAndLoad(user, pass, false);
+    }
+
+    async function authenticateAndLoad(user, pass, isAuto) {
+      const btn = document.getElementById('btnLogin');
+      const errBox = document.getElementById('loginError');
+      btn.disabled = true;
+      btn.innerText = 'Memverifikasi...';
+      errBox.classList.add('d-none');
+
+      try {
+        const url = `${API_URL}?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Masuk ke Sistem';
+
+        if (!data.authorized) {
+          sessionStorage.removeItem('mhe_auth');
+          if (!isAuto) {
+            errBox.innerText = data.message || 'Username atau password salah.';
+            errBox.classList.remove('d-none');
+          }
+          return;
+        }
+
+        sessionStorage.setItem('mhe_auth', JSON.stringify({ user, pass }));
+        currentUser = { ...data.user, pass };
+        appState = data;
+
+        document.getElementById('loginScreen').classList.add('d-none');
+        document.getElementById('appScreen').classList.remove('d-none');
+        document.getElementById('userBadge').innerHTML = `<i class="bi bi-person-circle me-1"></i>${currentUser.nama} (${currentUser.role})`;
+
+        if (currentUser.role !== 'ADMIN') {
+          document.getElementById('btnExport').classList.add('d-none');
+        }
+
+        populateDropdowns();
+        renderDashboard();
+        renderTransactions();
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Masuk ke Sistem';
+        errBox.innerText = 'Gagal terhubung ke server. Periksa izin akses Apps Script.';
+        errBox.classList.remove('d-none');
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('mhe_auth');
+      location.reload();
+    }
+
+    async function loadData() {
+      if (!currentUser) return;
+      await authenticateAndLoad(currentUser.username, currentUser.pass, true);
+    }
+
+    function populateDropdowns() {
+      document.getElementById('pengirim').innerHTML = appState.warehouses.map(w => `<option value="${w}">${w}</option>`).join('');
+      document.getElementById('penerima').innerHTML = appState.warehouses.map(w => `<option value="${w}">${w}</option>`).join('');
+      document.getElementById('mheList').innerHTML = appState.mheTypes.map(m => `<option value="${m}">`).join('');
+    }
+
+    function renderDashboard() {
+      const totalMaster = appState.masterData.reduce((acc, item) => acc + item.qty, 0);
+      document.getElementById('kpiMaster').innerText = totalMaster.toLocaleString('id-ID');
+      document.getElementById('kpiTotalLog').innerText = appState.transactions.length;
+
+      const sjMap = {};
+      appState.transactions.forEach(tx => {
+        if (!sjMap[tx.noSjmhe]) sjMap[tx.noSjmhe] = { kirim: false, terima: false };
+        if (tx.status === 'Pengiriman') sjMap[tx.noSjmhe].kirim = true;
+        if (tx.status === 'Penerimaan') sjMap[tx.noSjmhe].terima = true;
+      });
+
+      let inTransit = 0, completed = 0;
+      Object.values(sjMap).forEach(st => {
+        if (st.kirim && st.terima) completed++;
+        else if (st.kirim && !st.terima) inTransit++;
+      });
+
+      document.getElementById('kpiTransit').innerText = inTransit;
+      document.getElementById('kpiCompleted').innerText = completed;
+
+      const grouped = {}, whTotals = {};
+      appState.masterData.forEach(item => {
+        const key = `${item.gudang}||${item.jenis}`;
+        grouped[key] = (grouped[key] || 0) + item.qty;
+        whTotals[item.gudang] = (whTotals[item.gudang] || 0) + item.qty;
+      });
+
+      document.getElementById('masterSummaryBody').innerHTML = Object.entries(grouped).sort().map(([k, q]) => {
+        const [g, j] = k.split('||');
+        return `<tr><td class="fw-bold">${g}</td><td>${j}</td><td class="text-end fw-bold">${q}</td></tr>`;
+      }).join('');
+
+      const ctx = document.getElementById('warehouseChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(whTotals),
+          datasets: [{ label: 'Total Unit', data: Object.values(whTotals), backgroundColor: '#2563eb', borderRadius: 6 }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+    }
+
+    function renderTransactions() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+
+      const filtered = appState.transactions.filter(tx => {
+        const matchStatus = !statusFilter || tx.status === statusFilter;
+        const matchText = !search || [tx.noSjmhe, tx.kodeUnit, tx.jenisMhe, tx.checker, tx.pengirim, tx.penerima]
+          .some(v => String(v).toLowerCase().includes(search));
+        return matchStatus && matchText;
+      });
+
+      const tbody = document.getElementById('txTableBody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data transaksi.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(tx => {
+        const editBtn = currentUser.role === 'ADMIN'
+          ? `<button class="btn btn-sm btn-outline-primary" onclick='openEditModal(${JSON.stringify(tx)})' title="Revisi"><i class="bi bi-pencil-square"></i></button>`
+          : '';
+
+        return `<tr>
+          <td class="fw-bold text-primary">${tx.noSjmhe}</td>
+          <td><span class="badge ${tx.status === 'Pengiriman' ? 'badge-kirim' : 'badge-terima'}">${tx.status}</span></td>
+          <td>${tx.pengirim} <i class="bi bi-arrow-right mx-1 text-muted"></i> ${tx.penerima}</td>
+          <td><div class="fw-semibold">${tx.jenisMhe} (${tx.qty})</div><small class="text-muted">${tx.kodeUnit}</small></td>
+          <td><div>${tx.checker}</div><small class="text-muted">${tx.timestamp}</small></td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-dark me-1" onclick='openPrintModal(${JSON.stringify(tx)})' title="Print SJ"><i class="bi bi-printer"></i></button>
+            ${editBtn}
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function generateAutoNumber() {
+      const now = new Date();
+      const prefix = `SJMHE-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-`;
+      let max = 0;
+      appState.transactions.forEach(t => {
+        if (t.noSjmhe.startsWith(prefix)) {
+          const n = parseInt(t.noSjmhe.replace(prefix, ''), 10);
+          if (!isNaN(n) && n > max) max = n;
+        }
+      });
+      document.getElementById('noSjmhe').value = prefix + String(max + 1).padStart(3, '0');
+    }
+
+    function openFormModal() {
+      document.getElementById('txForm').reset();
+      document.getElementById('rowIndex').value = '';
+      document.getElementById('checker').value = currentUser.nama;
+      document.getElementById('modalTitle').innerText = 'Input Transaksi MHE Baru';
+      generateAutoNumber();
+      txModalObj.show();
+    }
+
+    function openEditModal(tx) {
+      document.getElementById('rowIndex').value = tx.rowIndex;
+      document.getElementById('modalTitle').innerText = `Revisi Data: ${tx.noSjmhe}`;
+      document.getElementById('noSjmhe').value = tx.noSjmhe;
+      document.getElementById('status').value = tx.status;
+      document.getElementById('pengirim').value = tx.pengirim;
+      document.getElementById('penerima').value = tx.penerima;
+      document.getElementById('jenisMhe').value = tx.jenisMhe;
+      document.getElementById('kodeUnit').value = tx.kodeUnit;
+      document.getElementById('qty').value = tx.qty;
+      document.getElementById('checker').value = tx.checker;
+      document.getElementById('driverInfo').value = tx.driverInfo;
+      document.getElementById('keterangan').value = tx.keterangan;
+      txModalObj.show();
+    }
+
+    async function submitTransaction(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSave');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
+
+      const payload = {
+        authUser: currentUser.username,
+        authPass: currentUser.pass,
+        rowIndex: document.getElementById('rowIndex').value,
+        noSjmhe: document.getElementById('noSjmhe').value,
+        status: document.getElementById('status').value,
+        pengirim: document.getElementById('pengirim').value,
+        penerima: document.getElementById('penerima').value,
+        jenisMhe: document.getElementById('jenisMhe').value,
+        kodeUnit: document.getElementById('kodeUnit').value,
+        qty: document.getElementById('qty').value,
+        checker: document.getElementById('checker').value,
+        driverInfo: document.getElementById('driverInfo').value,
+        keterangan: document.getElementById('keterangan').value
+      };
+
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      btn.disabled = false;
+      btn.innerText = 'Simpan Data';
+      txModalObj.hide();
+      setTimeout(loadData, 1200);
+    }
+
+    function openPrintModal(tx) {
+      document.getElementById('sjNo').innerText = tx.noSjmhe;
+      document.getElementById('sjDate').innerText = tx.timestamp;
+      document.getElementById('sjPengirim').innerText = tx.pengirim;
+      document.getElementById('sjPenerima').innerText = tx.penerima;
+      document.getElementById('sjStatus').innerText = tx.status;
+      document.getElementById('sjDriver').innerText = tx.driverInfo || '-';
+      document.getElementById('sjJenis').innerText = tx.jenisMhe;
+      document.getElementById('sjKode').innerText = tx.kodeUnit;
+      document.getElementById('sjQty').innerText = tx.qty + ' Unit';
+      document.getElementById('sjKet').innerText = tx.keterangan || 'Baik / Lengkap';
+      document.getElementById('sjPicPengirim').innerText = `( ${tx.checker} )`;
+
+      const qrContainer = document.getElementById('sjQrCode');
+      qrContainer.innerHTML = '';
+      new QRCode(qrContainer, { text: `${tx.noSjmhe}|${tx.pengirim}->${tx.penerima}|${tx.qty}Unit`, width: 64, height: 64 });
+
+      printModalObj.show();
+    }
+
+    function exportToExcel() {
+      const rows = appState.transactions.map(t => ({
+        'Nomor SJMHE': t.noSjmhe, 'Timestamp': t.timestamp, 'Status': t.status,
+        'Checker': t.checker, 'Pengirim': t.pengirim, 'Penerima': t.penerima,
+        'Jenis MHE': t.jenisMhe, 'Kode Unit': t.kodeUnit, 'Qty': t.qty,
+        'No. Polisi / Driver': t.driverInfo, 'Keterangan': t.keterangan
+      }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Transaksi_MHE');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appState.masterData), 'Master_MHE');
+      XLSX.writeFile(wb, `MHE_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+  </script>
+</body>
+</html>
