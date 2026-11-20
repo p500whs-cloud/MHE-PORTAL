@@ -30,6 +30,8 @@
     .avail-badge { display: inline-flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 0.82rem; transition: all 0.15s; }
     .avail-badge:hover { border-color: #2563eb; background: #eff6ff; }
     .unit-lookup-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; max-height: 290px; overflow-y: auto; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 12px 28px rgba(0,0,0,0.15); }
+    .nav-pills .nav-link { color: #475569; font-weight: 600; border-radius: 10px; padding: 9px 18px; }
+    .nav-pills .nav-link.active { background-color: #0f172a; color: #fff; }
 
     @media print {
       body * { visibility: hidden; }
@@ -147,13 +149,11 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
       </div>
       <div class="offcanvas-body bg-light">
-        <!-- Selector Gudang di dalam Sidebar -->
         <div class="card border-0 shadow-sm p-3 mb-3">
           <label class="form-label fw-bold small text-muted mb-1">PILIH LOKASI GUDANG</label>
           <select id="sidebarWarehouseSelect" class="form-select fw-bold border-primary" onchange="renderSidebarContent()"></select>
         </div>
 
-        <!-- Ringkasan Angka Gudang Terpilih -->
         <div class="row g-2 mb-3">
           <div class="col-4">
             <div class="bg-white p-2.5 rounded border text-center">
@@ -175,7 +175,6 @@
           </div>
         </div>
 
-        <!-- Tabel Rekap Kategori di Gudang Ini -->
         <div class="card border-0 shadow-sm p-3 mb-3">
           <h6 class="fw-bold small text-uppercase text-primary mb-2"><i class="bi bi-list-check me-1"></i>Rekap Stok per Jenis MHE</h6>
           <div class="table-responsive" style="max-height: 180px;">
@@ -188,7 +187,6 @@
           </div>
         </div>
 
-        <!-- Daftar Kode Unit yang Available di Gudang Ini -->
         <div class="card border-0 shadow-sm p-3">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="fw-bold small text-uppercase text-success mb-0"><i class="bi bi-check-circle-fill me-1"></i>ID Code Unit Available</h6>
@@ -209,151 +207,405 @@
       </div>
     </div>
 
-    <!-- KONTEN UTAMA DASHBOARD -->
+    <!-- KONTEN UTAMA -->
     <div class="container-fluid px-4 py-4 no-print">
-      <!-- 6 KARTU KPI EXECUTIVE -->
-      <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4 col-xl-2">
-          <div class="card kpi-card p-3 border-start border-primary border-4 h-100">
-            <small class="text-muted fw-bold" style="font-size:0.72rem;">TOTAL OPENING STOCK</small>
-            <h3 class="mb-0 mt-1 fw-bold text-primary" id="kpiMaster">-</h3>
-            <small class="text-muted" style="font-size:0.75rem;">Total aset terdaftar</small>
-          </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl-2">
-          <div class="card kpi-card p-3 border-start border-success border-4 h-100">
-            <small class="text-muted fw-bold" style="font-size:0.72rem;">STANDBY DI GUDANG</small>
-            <h3 class="mb-0 mt-1 fw-bold text-success" id="kpiStandby">-</h3>
-            <small class="text-muted" style="font-size:0.75rem;">Tersedia untuk mutasi</small>
-          </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl-2">
-          <div class="card kpi-card p-3 border-start border-warning border-4 h-100">
-            <small class="text-muted fw-bold" style="font-size:0.72rem;">IN-TRANSIT (OPEN)</small>
-            <h3 class="mb-0 mt-1 fw-bold text-warning" id="kpiTransit">-</h3>
-            <small class="text-muted" style="font-size:0.75rem;">Unit belum diterima</small>
-          </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl-2">
-          <div class="card kpi-card p-3 border-start border-4 h-100" style="border-left-color:#0d9488 !important;">
-            <small class="text-muted fw-bold" style="font-size:0.72rem;">SJMHE SELESAI</small>
-            <h3 class="mb-0 mt-1 fw-bold" style="color:#0d9488;" id="kpiCompleted">-</h3>
-            <small class="text-muted" style="font-size:0.75rem;">Kirim & terima cocok</small>
-          </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl-2">
-          <div class="card kpi-card p-3 border-start border-info border-4 h-100">
-            <small class="text-muted fw-bold" style="font-size:0.72rem;">DOKUMEN PDF LENGKAP</small>
-            <h3 class="mb-0 mt-1 fw-bold text-info" id="kpiPdfRate">-</h3>
-            <small class="text-muted" id="kpiPdfSub" style="font-size:0.75rem;">0 dari 0 transaksi</small>
-          </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl-2">
-          <div class="card kpi-card p-3 border-start border-danger border-4 h-100">
-            <small class="text-muted fw-bold" style="font-size:0.72rem;">PENDING DOKUMEN PDF</small>
-            <h3 class="mb-0 mt-1 fw-bold text-danger" id="kpiMissingPdf">-</h3>
-            <small class="text-muted" style="font-size:0.75rem;">SJMHE tanpa file PDF</small>
-          </div>
-        </div>
+      <!-- NAVIGASI TAB UTAMA -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <ul class="nav nav-pills bg-white p-1.5 rounded-3 shadow-sm border" id="mainTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-dashboard-btn" data-bs-toggle="pill" data-bs-target="#tab-dashboard" type="button" role="tab">
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard & Log Mutasi
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-stocktake-btn" data-bs-toggle="pill" data-bs-target="#tab-stocktake" type="button" role="tab" onclick="renderStockTakeTable()">
+              <i class="bi bi-clipboard-check me-2"></i>Stock Take per Gudang
+            </button>
+          </li>
+          <li class="nav-item" role="presentation" id="navItemAdjustment">
+            <button class="nav-link" id="tab-adjustment-btn" data-bs-toggle="pill" data-bs-target="#tab-adjustment" type="button" role="tab" onclick="renderAdjustmentView()">
+              <i class="bi bi-sliders me-2"></i>Adjustment & Master Unit
+            </button>
+          </li>
+        </ul>
       </div>
 
-      <!-- GRAFIK & ALERT IN-TRANSIT -->
-      <div class="row g-4 mb-4">
-        <div class="col-lg-5">
-          <div class="card-box h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <span class="section-title"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Distribusi Stok per Gudang (Real-Time)</span>
+      <div class="tab-content">
+        <!-- ========================================================= -->
+        <!-- TAB 1: DASHBOARD EXECUTIVE & LOG MUTASI                   -->
+        <!-- ========================================================= -->
+        <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel">
+          <!-- 6 KARTU KPI EXECUTIVE -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="card kpi-card p-3 border-start border-primary border-4 h-100">
+                <small class="text-muted fw-bold" style="font-size:0.72rem;">TOTAL OPENING STOCK</small>
+                <h3 class="mb-0 mt-1 fw-bold text-primary" id="kpiMaster">-</h3>
+                <small class="text-muted" style="font-size:0.75rem;">Total aset terdaftar</small>
+              </div>
             </div>
-            <canvas id="warehouseChart" height="170"></canvas>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="card kpi-card p-3 border-start border-success border-4 h-100">
+                <small class="text-muted fw-bold" style="font-size:0.72rem;">STANDBY DI GUDANG</small>
+                <h3 class="mb-0 mt-1 fw-bold text-success" id="kpiStandby">-</h3>
+                <small class="text-muted" style="font-size:0.75rem;">Tersedia untuk mutasi</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="card kpi-card p-3 border-start border-warning border-4 h-100">
+                <small class="text-muted fw-bold" style="font-size:0.72rem;">IN-TRANSIT (OPEN)</small>
+                <h3 class="mb-0 mt-1 fw-bold text-warning" id="kpiTransit">-</h3>
+                <small class="text-muted" style="font-size:0.75rem;">Unit belum diterima</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="card kpi-card p-3 border-start border-4 h-100" style="border-left-color:#0d9488 !important;">
+                <small class="text-muted fw-bold" style="font-size:0.72rem;">SJMHE SELESAI</small>
+                <h3 class="mb-0 mt-1 fw-bold" style="color:#0d9488;" id="kpiCompleted">-</h3>
+                <small class="text-muted" style="font-size:0.75rem;">Kirim & terima cocok</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="card kpi-card p-3 border-start border-info border-4 h-100">
+                <small class="text-muted fw-bold" style="font-size:0.72rem;">DOKUMEN PDF LENGKAP</small>
+                <h3 class="mb-0 mt-1 fw-bold text-info" id="kpiPdfRate">-</h3>
+                <small class="text-muted" id="kpiPdfSub" style="font-size:0.75rem;">0 dari 0 transaksi</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="card kpi-card p-3 border-start border-danger border-4 h-100">
+                <small class="text-muted fw-bold" style="font-size:0.72rem;">PENDING DOKUMEN PDF</small>
+                <h3 class="mb-0 mt-1 fw-bold text-danger" id="kpiMissingPdf">-</h3>
+                <small class="text-muted" style="font-size:0.75rem;">SJMHE tanpa file PDF</small>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="col-lg-3">
-          <div class="card-box h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <span class="section-title"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Proporsi Kategori MHE</span>
+
+          <!-- GRAFIK & ALERT IN-TRANSIT -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-5">
+              <div class="card-box h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="section-title"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Distribusi Stok per Gudang (Real-Time)</span>
+                </div>
+                <canvas id="warehouseChart" height="170"></canvas>
+              </div>
             </div>
-            <canvas id="categoryChart" height="170"></canvas>
+            <div class="col-lg-3">
+              <div class="card-box h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="section-title"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Proporsi Kategori MHE</span>
+                </div>
+                <canvas id="categoryChart" height="170"></canvas>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="card-box h-100 border-warning">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="section-title text-warning-emphasis"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>Monitoring In-Transit (Belum Diterima)</span>
+                  <span class="badge bg-warning text-dark" id="badgeOpenCount">0 Open</span>
+                </div>
+                <p class="text-muted small mb-2">Klik <strong>Terima</strong> untuk konfirmasi penerimaan & upload PDF Penerimaan:</p>
+                <div class="table-responsive" style="max-height: 225px;">
+                  <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.82rem;">
+                    <thead class="table-light">
+                      <tr><th>No. SJMHE</th><th>Rute</th><th>Unit</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="openTransitBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="card-box h-100 border-warning">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="section-title text-warning-emphasis"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>Monitoring In-Transit (Belum Diterima)</span>
-              <span class="badge bg-warning text-dark" id="badgeOpenCount">0 Open</span>
+
+          <!-- SUMMARY MATRIX LENGKAP -->
+          <div class="card-box mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <div>
+                <span class="section-title"><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>SUMMARY MATRIX STOK MHE PER GUDANG (REAL-TIME)</span>
+                <p class="text-muted small mb-0">Klik nama gudang pada header kolom untuk membuka Slide Bar rincian unit yang available.</p>
+              </div>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">Live Sync Spreadsheet</span>
             </div>
-            <p class="text-muted small mb-2">Klik <strong>Terima</strong> untuk konfirmasi penerimaan & upload PDF Penerimaan:</p>
-            <div class="table-responsive" style="max-height: 225px;">
-              <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.82rem;">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle mb-0 matrix-table" id="summaryMatrixTable">
+                <thead id="matrixHead"></thead>
+                <tbody id="matrixBody"></tbody>
+                <tfoot id="matrixFoot" class="table-dark fw-bold"></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- TABEL RIWAYAT MUTASI & DOKUMEN PDF -->
+          <div class="card-box">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <span class="section-title"><i class="bi bi-journal-text me-2 text-primary"></i>Log Mutasi & Arsip Dokumen PDF SJMHE</span>
+              <div class="d-flex flex-wrap gap-2">
+                <select id="filterWarehouse" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
+                  <option value="">Semua Gudang</option>
+                </select>
+                <select id="filterStatus" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
+                  <option value="">Semua Status</option>
+                  <option value="Pengiriman">Pengiriman</option>
+                  <option value="Penerimaan">Penerimaan</option>
+                </select>
+                <select id="filterPdf" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
+                  <option value="">Semua Dokumen</option>
+                  <option value="HAS_PDF">Sudah Upload PDF</option>
+                  <option value="NO_PDF">Belum Upload PDF</option>
+                </select>
+                <input type="text" id="searchInput" class="form-control form-control-sm" style="width:220px;" placeholder="Cari SJMHE / Unit / PIC..." onkeyup="renderTransactions()">
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle" style="font-size: 0.88rem;">
                 <thead class="table-light">
-                  <tr><th>No. SJMHE</th><th>Rute</th><th>Unit</th><th>Aksi</th></tr>
+                  <tr>
+                    <th>No. SJMHE</th>
+                    <th>Status</th>
+                    <th>Rute Gudang</th>
+                    <th>Jenis & ID Code Unit</th>
+                    <th>Checker & Waktu</th>
+                    <th class="text-center">PDF Pengiriman</th>
+                    <th class="text-center">PDF Penerimaan</th>
+                    <th class="text-center" style="min-width: 135px;">Aksi</th>
+                  </tr>
                 </thead>
-                <tbody id="openTransitBody"></tbody>
+                <tbody id="txTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 2: LEMBAR STOCK TAKE UNIT PER GUDANG                  -->
+        <!-- ========================================================= -->
+        <div class="tab-pane fade" id="tab-stocktake" role="tabpanel">
+          <div class="card-box mb-4">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label fw-bold small text-uppercase text-muted">1. Pilih Gudang Stock Take</label>
+                <select id="stWarehouseSelect" class="form-select fw-bold border-primary" onchange="renderStockTakeTable()"></select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold small text-uppercase text-muted">2. Filter Jenis MHE</label>
+                <select id="stTypeSelect" class="form-select" onchange="renderStockTakeTable()">
+                  <option value="">Semua Jenis MHE</option>
+                </select>
+              </div>
+              <div class="col-md-5 d-flex flex-wrap gap-2 justify-content-md-end">
+                <button class="btn btn-outline-success btn-sm" onclick="markAllStockTake('Sesuai')">
+                  <i class="bi bi-check2-all me-1"></i>Tandai Semua Sesuai
+                </button>
+                <button class="btn btn-outline-primary btn-sm" onclick="exportStockTakeExcel()">
+                  <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export Kertas Kerja
+                </button>
+                <button class="btn btn-primary fw-bold btn-sm" id="btnSaveStockTake" onclick="submitStockTake()">
+                  <i class="bi bi-cloud-upload me-1"></i>Simpan Hasil Stock Take
+                </button>
+              </div>
+            </div>
+
+            <div class="row g-2 mt-3 pt-3 border-top text-center">
+              <div class="col-6 col-md-3">
+                <div class="p-2 rounded bg-light border">
+                  <small class="text-muted d-block fw-semibold">Total Unit Sistem</small>
+                  <span class="fs-5 fw-bold text-dark" id="stCountTotal">0</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 rounded bg-success bg-opacity-10 border border-success">
+                  <small class="text-success d-block fw-semibold">Fisik Sesuai / Ada</small>
+                  <span class="fs-5 fw-bold text-success" id="stCountSesuai">0</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 rounded bg-danger bg-opacity-10 border border-danger">
+                  <small class="text-danger d-block fw-semibold">Selisih / Tidak Ada</small>
+                  <span class="fs-5 fw-bold text-danger" id="stCountSelisih">0</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 rounded bg-warning bg-opacity-10 border border-warning">
+                  <small class="text-warning-emphasis d-block fw-semibold">Rusak / Perlu Perbaikan</small>
+                  <span class="fs-5 fw-bold text-warning-emphasis" id="stCountRusak">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <span class="section-title"><i class="bi bi-list-check me-2 text-primary"></i>Lembar Kerja Stock Take — Gudang: <span id="stWarehouseLabel" class="text-primary">-</span></span>
+              <input type="text" id="stSearchInput" class="form-control form-control-sm" style="max-width: 240px;" placeholder="Cari ID Code Unit..." onkeyup="filterStockTakeRows()">
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle" style="font-size: 0.88rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th width="50">No</th>
+                    <th>ID Code Unit</th>
+                    <th>Jenis MHE</th>
+                    <th>Status Sistem</th>
+                    <th width="290">Hasil Cek Fisik</th>
+                    <th>Catatan / Keterangan Lapangan</th>
+                  </tr>
+                </thead>
+                <tbody id="stTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 3: ADJUSTMENT & MASTER UNIT MHE (ADMIN)               -->
+        <!-- ========================================================= -->
+        <div class="tab-pane fade" id="tab-adjustment" role="tabpanel">
+          <!-- FORM POSTING PENAMBAHAN UNIT BARU -->
+          <div class="card-box mb-4 border-start border-warning border-4">
+            <div class="mb-3">
+              <span class="section-title"><i class="bi bi-plus-circle-fill me-2 text-warning"></i>Input Adjustment Penambahan Unit Baru</span>
+              <p class="text-muted small mb-0">Tambahkan unit MHE baru ke master gudang dan klik <strong>Posting</strong> untuk langsung menyimpannya ke database.</p>
+            </div>
+            <form id="adjAddForm" onsubmit="submitAddAdjustment(event)">
+              <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                  <label class="form-label fw-bold small">Gudang Penempatan</label>
+                  <select class="form-select" id="adjAddGudang" required></select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold small">ID Code Unit</label>
+                  <input type="text" class="form-control" id="adjAddKode" placeholder="Contoh: RLP-160" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold small">Nama / Jenis MHE</label>
+                  <input class="form-control" list="mheDatalist" id="adjAddJenis" placeholder="Contoh: New Roller Pallet" required>
+                  <datalist id="mheDatalist"></datalist>
+                </div>
+                <div class="col-md-1">
+                  <label class="form-label fw-bold small">Qty</label>
+                  <input type="number" class="form-control" id="adjAddQty" value="1" min="1" required>
+                </div>
+                <div class="col-md-2">
+                  <button type="submit" id="btnPostingAdd" class="btn btn-warning fw-bold w-100">
+                    <i class="bi bi-send-check me-1"></i>Posting
+                  </button>
+                </div>
+                <div class="col-12">
+                  <input type="text" class="form-control form-control-sm" id="adjAddAlasan" placeholder="Alasan / Keterangan Adjustment (misal: Pengadaan unit baru / temuan fisik stock take)..." required>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- DAFTAR MASTER UNIT & REVISI ID CODE -->
+          <div class="card-box mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <span class="section-title"><i class="bi bi-database-gear me-2 text-primary"></i>Daftar Master Unit & Revisi ID Code</span>
+              <div class="d-flex gap-2">
+                <select id="adjFilterGudang" class="form-select form-select-sm" onchange="renderAdjustmentTable()">
+                  <option value="">Semua Gudang</option>
+                </select>
+                <input type="text" id="adjSearchInput" class="form-control form-control-sm" placeholder="Cari ID Code / Nama MHE..." onkeyup="renderAdjustmentTable()">
+              </div>
+            </div>
+            <div class="table-responsive" style="max-height: 400px;">
+              <table class="table table-hover align-middle" style="font-size: 0.88rem;">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th width="50">No</th>
+                    <th>ID Code Unit</th>
+                    <th>Nama / Jenis MHE</th>
+                    <th>Gudang Master</th>
+                    <th>Lokasi Terkini</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="adjMasterTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- RIWAYAT LOG ADJUSTMENT -->
+          <div class="card-box">
+            <span class="section-title d-block mb-3"><i class="bi bi-clock-history me-2 text-secondary"></i>Riwayat Posting Adjustment</span>
+            <div class="table-responsive" style="max-height: 260px;">
+              <table class="table table-sm table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Tipe</th>
+                    <th>Gudang</th>
+                    <th>ID Code Lama</th>
+                    <th>ID Code Baru</th>
+                    <th>Nama MHE</th>
+                    <th class="text-center">Qty</th>
+                    <th>PIC & Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="adjHistoryBody"></tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- SUMMARY MATRIX LENGKAP -->
-      <div class="card-box mb-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-          <div>
-            <span class="section-title"><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>SUMMARY MATRIX STOK MHE PER GUDANG (REAL-TIME)</span>
-            <p class="text-muted small mb-0">Klik nama gudang pada header kolom untuk membuka Slide Bar rincian unit yang available.</p>
+  <!-- MODAL REVISI ID CODE & DATA UNIT (ADJUSTMENT) -->
+  <div class="modal fade no-print" id="adjEditModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title"><i class="bi bi-pencil-square me-2 text-warning"></i>Revisi ID Code & Data Unit</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="submitReviseAdjustment(event)">
+          <div class="modal-body">
+            <input type="hidden" id="revMasterRowIndex">
+            <input type="hidden" id="revKodeLama">
+            <div class="mb-3">
+              <label class="form-label fw-bold small">Gudang Unit</label>
+              <select class="form-select" id="revGudang" required></select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold small">ID Code Unit (Revisi)</label>
+              <input type="text" class="form-control fw-bold text-primary" id="revKodeBaru" required>
+              <small class="text-muted">Perubahan ID Code otomatis memperbarui data di Master & Riwayat Transaksi.</small>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-8">
+                <label class="form-label fw-bold small">Nama / Jenis MHE</label>
+                <input class="form-control" list="mheDatalist" id="revJenisMhe" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label fw-bold small">Quantity</label>
+                <input type="number" class="form-control" id="revQty" min="1" required>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-bold small">Alasan Revisi / Adjustment</label>
+              <input type="text" class="form-control" id="revAlasan" placeholder="Contoh: Koreksi salah ketik kode unit / relabeling" required>
+            </div>
           </div>
-          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">Live Sync Spreadsheet</span>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover align-middle mb-0 matrix-table" id="summaryMatrixTable">
-            <thead id="matrixHead"></thead>
-            <tbody id="matrixBody"></tbody>
-            <tfoot id="matrixFoot" class="table-dark fw-bold"></tfoot>
-          </table>
-        </div>
-      </div>
-
-      <!-- TABEL RIWAYAT MUTASI & DOKUMEN PDF -->
-      <div class="card-box">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-          <span class="section-title"><i class="bi bi-journal-text me-2 text-primary"></i>Log Mutasi & Arsip Dokumen PDF SJMHE</span>
-          <div class="d-flex flex-wrap gap-2">
-            <select id="filterWarehouse" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
-              <option value="">Semua Gudang</option>
-            </select>
-            <select id="filterStatus" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
-              <option value="">Semua Status</option>
-              <option value="Pengiriman">Pengiriman</option>
-              <option value="Penerimaan">Penerimaan</option>
-            </select>
-            <select id="filterPdf" class="form-select form-select-sm" style="width:auto;" onchange="renderTransactions()">
-              <option value="">Semua Dokumen</option>
-              <option value="HAS_PDF">Sudah Upload PDF</option>
-              <option value="NO_PDF">Belum Upload PDF</option>
-            </select>
-            <input type="text" id="searchInput" class="form-control form-control-sm" style="width:220px;" placeholder="Cari SJMHE / Unit / PIC..." onkeyup="renderTransactions()">
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-outline-danger btn-sm" id="btnDeleteMasterUnit" onclick="submitDeleteMasterUnit()">
+              <i class="bi bi-trash me-1"></i>Hapus Unit
+            </button>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-warning fw-bold" id="btnPostingRevise">
+                <i class="bi bi-send-check me-1"></i>Posting Revisi
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle" style="font-size: 0.88rem;">
-            <thead class="table-light">
-              <tr>
-                <th>No. SJMHE</th>
-                <th>Status</th>
-                <th>Rute Gudang</th>
-                <th>Jenis & ID Code Unit</th>
-                <th>Checker & Waktu</th>
-                <th class="text-center">PDF Pengiriman</th>
-                <th class="text-center">PDF Penerimaan</th>
-                <th class="text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="txTableBody"></tbody>
-          </table>
-        </div>
+        </form>
       </div>
     </div>
   </div>
-  <!-- MODAL INPUT / REVISI + UPLOAD PDF -->
+
+  <!-- MODAL INPUT / REVISI + UPLOAD PDF + HAPUS TRANSAKSI -->
   <div class="modal fade no-print" id="txModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -439,9 +691,16 @@
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-primary fw-bold" id="btnSave"><i class="bi bi-cloud-upload me-1"></i>Simpan & Upload</button>
+          <div class="modal-footer justify-content-between">
+            <div>
+              <button type="button" class="btn btn-outline-danger d-none" id="btnDeleteTxInModal" onclick="deleteFromTxModal()">
+                <i class="bi bi-trash me-1"></i>Hapus Transaksi Ini
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-primary fw-bold" id="btnSave"><i class="bi bi-cloud-upload me-1"></i>Simpan & Upload</button>
+            </div>
           </div>
         </form>
       </div>
@@ -538,22 +797,24 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwbB0SbHQ7MsTMxqC27O-W2j1smB5OeqNpUQ5wxJqlpVgVCe3kW-i_AwM_PQPej8Ovo/exec';
 
-    let appState = { warehouses: [], mheTypes: [], masterData: [], unitInventory: [], transactions: [] };
+    let appState = { warehouses: [], mheTypes: [], masterData: [], unitInventory: [], transactions: [], adjustments: [] };
     let currentUser = null;
     let selectedCodes = [];
-    let txModalObj, printModalObj, sidebarObj, whChartInstance, catChartInstance;
+    let currentEditingTx = null;
+    let stockTakeList = [];
+    let txModalObj, printModalObj, sidebarObj, adjEditModalObj, whChartInstance, catChartInstance;
 
     document.addEventListener('DOMContentLoaded', () => {
       txModalObj = new bootstrap.Modal(document.getElementById('txModal'));
       printModalObj = new bootstrap.Modal(document.getElementById('printModal'));
       sidebarObj = new bootstrap.Offcanvas(document.getElementById('warehouseSidebar'));
+      adjEditModalObj = new bootstrap.Modal(document.getElementById('adjEditModal'));
 
       setInterval(() => {
         const el = document.getElementById('liveClock');
         if (el) el.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
       }, 1000);
 
-      // Tutup dropdown hasil searching unit jika klik di luar area
       document.addEventListener('click', (e) => {
         if (!e.target.closest('#globalUnitSearch') && !e.target.closest('#unitSearchResults')) {
           document.getElementById('unitSearchResults').classList.add('d-none');
@@ -608,11 +869,14 @@
 
         if (currentUser.role !== 'ADMIN') {
           document.getElementById('btnExport').classList.add('d-none');
+          document.getElementById('navItemAdjustment').classList.add('d-none');
         }
 
         populateDropdowns();
         renderExecutiveDashboard();
         renderTransactions();
+        if (document.getElementById('tab-stocktake').classList.contains('active')) renderStockTakeTable();
+        if (document.getElementById('tab-adjustment').classList.contains('active')) renderAdjustmentView();
       } catch (err) {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Masuk ke Sistem';
@@ -638,16 +902,35 @@
       document.getElementById('filterWarehouse').innerHTML = `<option value="">Semua Gudang</option>` + whOpts;
       document.getElementById('globalWarehouseSelect').innerHTML = `<option value="">-- Pilih Gudang (Semua Lokasi) --</option>` + whOpts;
       document.getElementById('sidebarWarehouseSelect').innerHTML = whOpts;
+      document.getElementById('adjAddGudang').innerHTML = whOpts;
+      document.getElementById('revGudang').innerHTML = whOpts;
+
+      const prevStWh = document.getElementById('stWarehouseSelect').value;
+      document.getElementById('stWarehouseSelect').innerHTML = whOpts;
+      if (prevStWh && appState.warehouses.includes(prevStWh)) {
+        document.getElementById('stWarehouseSelect').value = prevStWh;
+      }
+
+      const prevAdjWh = document.getElementById('adjFilterGudang').value;
+      document.getElementById('adjFilterGudang').innerHTML = `<option value="">Semua Gudang</option>` + whOpts;
+      if (prevAdjWh) document.getElementById('adjFilterGudang').value = prevAdjWh;
 
       const typeOpts = `<option value="">-- Semua Jenis MHE di Gudang Ini --</option>` +
         appState.mheTypes.map(m => `<option value="${m}">${m}</option>`).join('');
       document.getElementById('jenisMhe').innerHTML = typeOpts;
       document.getElementById('sbFilterType').innerHTML = `<option value="">Semua Jenis MHE</option>` +
         appState.mheTypes.map(m => `<option value="${m}">${m}</option>`).join('');
+
+      const prevStType = document.getElementById('stTypeSelect').value;
+      document.getElementById('stTypeSelect').innerHTML = `<option value="">Semua Jenis MHE</option>` +
+        appState.mheTypes.map(m => `<option value="${m}">${m}</option>`).join('');
+      if (prevStType) document.getElementById('stTypeSelect').value = prevStType;
+
+      document.getElementById('mheDatalist').innerHTML = appState.mheTypes.map(m => `<option value="${m}">`).join('');
     }
 
     // =========================================================
-    // FITUR TOOLBAR 1: SEARCHING UNIT GLOBAL (CEK LOKASI UNIT)
+    // FITUR TOOLBAR 1: SEARCHING UNIT GLOBAL
     // =========================================================
     function handleGlobalUnitSearch() {
       const q = document.getElementById('globalUnitSearch').value.trim().toLowerCase();
@@ -672,7 +955,7 @@
           ? `<span class="badge bg-warning text-dark">In-Transit (${u.lastSjmhe})</span>`
           : `<span class="badge bg-success">Standby</span>`;
         return `
-          <div class="d-flex justify-content-between align-items-center p-2 border-bottom hover-bg-light" style="cursor:pointer;" onclick="openWarehouseSidebar('${u.currentWarehouse}', '${u.kode}')">
+          <div class="d-flex justify-content-between align-items-center p-2 border-bottom" style="cursor:pointer;" onclick="openWarehouseSidebar('${u.currentWarehouse}', '${u.kode}')">
             <div>
               <div class="fw-bold text-primary small">${u.kode} <span class="text-dark fw-normal">- ${u.jenis}</span></div>
               <small class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Lokasi: <strong>${u.currentWarehouse}</strong></small>
@@ -699,9 +982,7 @@
       const wh = document.getElementById('globalWarehouseSelect').value;
       document.getElementById('filterWarehouse').value = wh;
       renderTransactions();
-      if (wh) {
-        openWarehouseSidebar(wh);
-      }
+      if (wh) openWarehouseSidebar(wh);
     }
 
     function openWarehouseSidebar(warehouseName, highlightCode = '') {
@@ -725,7 +1006,6 @@
       const standbyUnits = unitsInWh.filter(u => !u.inTransit);
       const transitUnits = unitsInWh.filter(u => u.inTransit);
 
-      // Rekap per Jenis MHE di gudang ini
       const typeMap = {};
       unitsInWh.forEach(u => {
         if (!typeMap[u.jenis]) typeMap[u.jenis] = { standby: 0, transit: 0 };
@@ -1026,8 +1306,12 @@
       }
 
       tbody.innerHTML = filtered.map(tx => {
-        const editBtn = currentUser.role === 'ADMIN'
-          ? `<button class="btn btn-sm btn-outline-primary" onclick='openEditModal(${JSON.stringify(tx)})' title="Revisi / Upload PDF"><i class="bi bi-pencil-square"></i></button>`
+        const isAdmin = currentUser.role === 'ADMIN';
+        const editBtn = isAdmin
+          ? `<button class="btn btn-sm btn-outline-primary me-1" onclick='openEditModal(${JSON.stringify(tx)})' title="Revisi / Upload PDF"><i class="bi bi-pencil-square"></i></button>`
+          : '';
+        const deleteBtn = isAdmin
+          ? `<button class="btn btn-sm btn-outline-danger" onclick='confirmDeleteTx(${JSON.stringify(tx)})' title="Hapus Transaksi (${tx.status})"><i class="bi bi-trash"></i></button>`
           : '';
 
         const btnPdfKirim = tx.pdfKirim
@@ -1046,14 +1330,400 @@
           <td><div>${tx.checker}</div><small class="text-muted">${tx.timestamp}</small></td>
           <td class="text-center">${btnPdfKirim}</td>
           <td class="text-center">${btnPdfTerima}</td>
-          <td class="text-center">
+          <td class="text-center text-nowrap">
             <button class="btn btn-sm btn-outline-dark me-1" onclick='openPrintModal(${JSON.stringify(tx)})' title="Print SJ"><i class="bi bi-printer"></i></button>
             ${editBtn}
+            ${deleteBtn}
           </td>
         </tr>`;
       }).join('');
     }
 
+    // =========================================================
+    // FITUR HAPUS TRANSAKSI (PENGIRIMAN & PENERIMAAN)
+    // =========================================================
+    async function confirmDeleteTx(tx) {
+      const pesan = `Hapus transaksi ${tx.status.toUpperCase()} ini?\n\n` +
+        `No. SJMHE : ${tx.noSjmhe}\n` +
+        `Rute      : ${tx.pengirim} -> ${tx.penerima}\n` +
+        `Unit      : ${tx.jenisMhe} (${tx.kodeUnit})\n\n` +
+        `Status lokasi unit akan otomatis dikembalikan ke posisi sebelumnya.`;
+
+      if (!confirm(pesan)) return;
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete',
+            authUser: currentUser.username,
+            authPass: currentUser.pass,
+            rowIndex: tx.rowIndex,
+            txId: tx.id
+          })
+        });
+        txModalObj.hide();
+        setTimeout(loadData, 1200);
+      } catch (err) {
+        alert('Gagal menghapus transaksi. Periksa koneksi internet Anda.');
+      }
+    }
+
+    function deleteFromTxModal() {
+      if (currentEditingTx) confirmDeleteTx(currentEditingTx);
+    }
+
+    // =========================================================
+    // FITUR STOCK TAKE UNIT PER GUDANG
+    // =========================================================
+    function renderStockTakeTable() {
+      const selectedWh = document.getElementById('stWarehouseSelect').value;
+      const selectedType = document.getElementById('stTypeSelect').value;
+      document.getElementById('stWarehouseLabel').innerText = selectedWh || '-';
+
+      const inventory = appState.unitInventory || [];
+      stockTakeList = inventory
+        .filter(u => u.currentWarehouse === selectedWh && (!selectedType || u.jenis === selectedType))
+        .sort((a, b) => a.kode.localeCompare(b.kode))
+        .map(u => ({
+          kode: u.kode,
+          jenis: u.jenis,
+          statusSistem: u.inTransit ? `In-Transit (${u.lastSjmhe})` : 'Standby di Gudang',
+          hasilFisik: 'Sesuai',
+          catatan: ''
+        }));
+
+      const tbody = document.getElementById('stTableBody');
+      if (stockTakeList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada unit MHE yang tercatat di gudang <strong>${selectedWh}</strong>.</td></tr>`;
+        updateStockTakeCounters();
+        return;
+      }
+
+      tbody.innerHTML = stockTakeList.map((item, idx) => `
+        <tr class="st-row" data-kode="${item.kode.toLowerCase()}" data-jenis="${item.jenis.toLowerCase()}">
+          <td>${idx + 1}</td>
+          <td class="fw-bold text-primary">${item.kode}</td>
+          <td>${item.jenis}</td>
+          <td>
+            <span class="badge ${item.statusSistem.startsWith('In-Transit') ? 'badge-kirim' : 'badge-terima'}">
+              ${item.statusSistem}
+            </span>
+          </td>
+          <td>
+            <div class="btn-group btn-group-sm w-100" role="group">
+              <input type="radio" class="btn-check" name="st_status_${idx}" id="st_ok_${idx}" value="Sesuai" checked onchange="updateStItem(${idx}, 'Sesuai')">
+              <label class="btn btn-outline-success" for="st_ok_${idx}"><i class="bi bi-check-lg"></i> Ada</label>
+
+              <input type="radio" class="btn-check" name="st_status_${idx}" id="st_miss_${idx}" value="Selisih" onchange="updateStItem(${idx}, 'Selisih')">
+              <label class="btn btn-outline-danger" for="st_miss_${idx}"><i class="bi bi-x-lg"></i> Selisih</label>
+
+              <input type="radio" class="btn-check" name="st_status_${idx}" id="st_dmg_${idx}" value="Rusak" onchange="updateStItem(${idx}, 'Rusak')">
+              <label class="btn btn-outline-warning" for="st_dmg_${idx}"><i class="bi bi-tools"></i> Rusak</label>
+            </div>
+          </td>
+          <td>
+            <input type="text" class="form-control form-control-sm" placeholder="Catatan fisik..." oninput="updateStNote(${idx}, this.value)">
+          </td>
+        </tr>
+      `).join('');
+
+      updateStockTakeCounters();
+    }
+
+    function updateStItem(idx, status) {
+      if (stockTakeList[idx]) {
+        stockTakeList[idx].hasilFisik = status;
+        updateStockTakeCounters();
+      }
+    }
+
+    function updateStNote(idx, val) {
+      if (stockTakeList[idx]) stockTakeList[idx].catatan = val;
+    }
+
+    function markAllStockTake(status) {
+      stockTakeList.forEach((item, idx) => {
+        item.hasilFisik = status;
+        const radio = document.getElementById(`st_ok_${idx}`);
+        if (radio && status === 'Sesuai') radio.checked = true;
+      });
+      updateStockTakeCounters();
+    }
+
+    function updateStockTakeCounters() {
+      document.getElementById('stCountTotal').innerText = stockTakeList.length;
+      document.getElementById('stCountSesuai').innerText = stockTakeList.filter(i => i.hasilFisik === 'Sesuai').length;
+      document.getElementById('stCountSelisih').innerText = stockTakeList.filter(i => i.hasilFisik === 'Selisih').length;
+      document.getElementById('stCountRusak').innerText = stockTakeList.filter(i => i.hasilFisik === 'Rusak').length;
+    }
+
+    function filterStockTakeRows() {
+      const q = document.getElementById('stSearchInput').value.toLowerCase();
+      document.querySelectorAll('.st-row').forEach(row => {
+        const match = row.dataset.kode.includes(q) || row.dataset.jenis.includes(q);
+        row.style.display = match ? '' : 'none';
+      });
+    }
+
+    async function submitStockTake() {
+      if (stockTakeList.length === 0) {
+        alert('Tidak ada unit di daftar Stock Take untuk disimpan.');
+        return;
+      }
+      const gudang = document.getElementById('stWarehouseSelect').value;
+      const sesuai = stockTakeList.filter(i => i.hasilFisik === 'Sesuai').length;
+      const selisih = stockTakeList.filter(i => i.hasilFisik === 'Selisih').length;
+      const rusak = stockTakeList.filter(i => i.hasilFisik === 'Rusak').length;
+
+      const konfirmasi = `Simpan hasil Stock Take untuk gudang ${gudang}?\n\n` +
+        `• Sesuai / Ada : ${sesuai} unit\n` +
+        `• Selisih      : ${selisih} unit\n` +
+        `• Rusak        : ${rusak} unit\n\n` +
+        `Data akan direkam ke sheet 'Stock_Take_MHE'.`;
+      if (!confirm(konfirmasi)) return;
+
+      const btn = document.getElementById('btnSaveStockTake');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menyimpan...';
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'stock_take',
+            authUser: currentUser.username,
+            authPass: currentUser.pass,
+            gudang: gudang,
+            items: stockTakeList
+          })
+        });
+        alert(`Hasil Stock Take gudang ${gudang} berhasil disimpan ke Google Sheets!`);
+      } catch (err) {
+        alert('Gagal menyimpan Stock Take. Periksa koneksi Anda.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Simpan Hasil Stock Take';
+      }
+    }
+
+    function exportStockTakeExcel() {
+      const gudang = document.getElementById('stWarehouseSelect').value;
+      if (stockTakeList.length === 0) {
+        alert('Tidak ada data unit untuk di-export.');
+        return;
+      }
+      const rows = stockTakeList.map((item, i) => ({
+        'No': i + 1,
+        'Gudang': gudang,
+        'ID Code Unit': item.kode,
+        'Jenis MHE': item.jenis,
+        'Status Sistem': item.statusSistem,
+        'Hasil Fisik': item.hasilFisik,
+        'Catatan Lapangan': item.catatan || ''
+      }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `ST_${gudang.replace(/\s+/g, '_')}`);
+      XLSX.writeFile(wb, `StockTake_${gudang}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    // =========================================================
+    // FITUR ADJUSTMENT & MASTER UNIT (POSTING TAMBAH & REVISI ID)
+    // =========================================================
+    function renderAdjustmentView() {
+      renderAdjustmentTable();
+      renderAdjustmentHistory();
+    }
+
+    function renderAdjustmentTable() {
+      const whFilter = document.getElementById('adjFilterGudang').value;
+      const q = document.getElementById('adjSearchInput').value.toLowerCase();
+      const units = appState.unitInventory || [];
+
+      const filtered = units.filter(u => {
+        const matchWh = !whFilter || u.currentWarehouse === whFilter || u.openingWarehouse === whFilter;
+        const matchText = !q || u.kode.toLowerCase().includes(q) || u.jenis.toLowerCase().includes(q);
+        return matchWh && matchText;
+      }).sort((a, b) => a.kode.localeCompare(b.kode));
+
+      const tbody = document.getElementById('adjMasterTableBody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Tidak ada unit MHE ditemukan.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((u, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td class="fw-bold text-primary">${u.kode}</td>
+          <td>${u.jenis}</td>
+          <td>${u.openingWarehouse || '-'}</td>
+          <td>
+            <span class="badge ${u.inTransit ? 'badge-kirim' : 'badge-terima'}">
+              ${u.currentWarehouse} ${u.inTransit ? '(In-Transit)' : ''}
+            </span>
+          </td>
+          <td class="text-center fw-bold">${u.qty}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary" onclick='openAdjEditModal(${JSON.stringify(u)})'>
+              <i class="bi bi-pencil-square me-1"></i>Revisi ID / Data
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdjustmentHistory() {
+      const adjs = appState.adjustments || [];
+      const tbody = document.getElementById('adjHistoryBody');
+      if (!adjs.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted">Belum ada riwayat posting adjustment.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = adjs.map(a => `
+        <tr>
+          <td>${a.timestamp}</td>
+          <td><span class="badge ${a.tipe.includes('PENAMBAHAN') ? 'bg-success' : (a.tipe.includes('HAPUS') ? 'bg-danger' : 'bg-primary')}">${a.tipe}</span></td>
+          <td class="fw-bold">${a.gudang}</td>
+          <td class="text-muted">${a.kodeLama}</td>
+          <td class="fw-bold text-primary">${a.kodeBaru}</td>
+          <td>${a.jenisMhe}</td>
+          <td class="text-center fw-bold">${a.qty}</td>
+          <td>${a.picAndNote}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function submitAddAdjustment(e) {
+      e.preventDefault();
+      const gudang = document.getElementById('adjAddGudang').value;
+      const kodeBaru = document.getElementById('adjAddKode').value.trim();
+      const jenisMhe = document.getElementById('adjAddJenis').value.trim();
+      const qty = Number(document.getElementById('adjAddQty').value) || 1;
+      const alasan = document.getElementById('adjAddAlasan').value.trim();
+
+      const exists = (appState.unitInventory || []).some(u => u.kode.toLowerCase() === kodeBaru.toLowerCase());
+      if (exists && !confirm(`ID Code "${kodeBaru}" sudah terdaftar di sistem. Tetap posting sebagai baris baru?`)) {
+        return;
+      }
+
+      const btn = document.getElementById('btnPostingAdd');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Posting...';
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'adjustment',
+            adjType: 'ADD',
+            authUser: currentUser.username,
+            authPass: currentUser.pass,
+            gudang,
+            kodeBaru,
+            jenisMhe,
+            qty,
+            alasan
+          })
+        });
+        document.getElementById('adjAddForm').reset();
+        document.getElementById('adjAddQty').value = 1;
+        setTimeout(loadData, 1400);
+      } catch (err) {
+        alert('Gagal memposting adjustment.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send-check me-1"></i>Posting';
+      }
+    }
+
+    function openAdjEditModal(unit) {
+      document.getElementById('revMasterRowIndex').value = unit.masterRowIndex || '';
+      document.getElementById('revKodeLama').value = unit.kode;
+      document.getElementById('revGudang').value = unit.currentWarehouse || unit.openingWarehouse;
+      document.getElementById('revKodeBaru').value = unit.kode;
+      document.getElementById('revJenisMhe').value = unit.jenis;
+      document.getElementById('revQty').value = unit.qty || 1;
+      document.getElementById('revAlasan').value = '';
+      document.getElementById('btnDeleteMasterUnit').style.display = unit.masterRowIndex ? 'inline-block' : 'none';
+      adjEditModalObj.show();
+    }
+
+    async function submitReviseAdjustment(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnPostingRevise');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Posting...';
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'adjustment',
+            adjType: 'REVISE',
+            authUser: currentUser.username,
+            authPass: currentUser.pass,
+            masterRowIndex: document.getElementById('revMasterRowIndex').value,
+            kodeLama: document.getElementById('revKodeLama').value,
+            gudang: document.getElementById('revGudang').value,
+            kodeBaru: document.getElementById('revKodeBaru').value.trim(),
+            jenisMhe: document.getElementById('revJenisMhe').value.trim(),
+            qty: Number(document.getElementById('revQty').value) || 1,
+            alasan: document.getElementById('revAlasan').value.trim()
+          })
+        });
+        adjEditModalObj.hide();
+        setTimeout(loadData, 1400);
+      } catch (err) {
+        alert('Gagal memposting revisi unit.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send-check me-1"></i>Posting Revisi';
+      }
+    }
+
+    async function submitDeleteMasterUnit() {
+      const kodeLama = document.getElementById('revKodeLama').value;
+      const mRow = document.getElementById('revMasterRowIndex').value;
+      if (!mRow) return;
+      if (!confirm(`Hapus permanen unit "${kodeLama}" dari sheet Opening Stock?`)) return;
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'adjustment',
+            adjType: 'DELETE_UNIT',
+            authUser: currentUser.username,
+            authPass: currentUser.pass,
+            masterRowIndex: mRow,
+            kodeLama: kodeLama,
+            gudang: document.getElementById('revGudang').value,
+            jenisMhe: document.getElementById('revJenisMhe').value,
+            qty: document.getElementById('revQty').value,
+            alasan: document.getElementById('revAlasan').value || 'Hapus unit dari master'
+          })
+        });
+        adjEditModalObj.hide();
+        setTimeout(loadData, 1400);
+      } catch (err) {
+        alert('Gagal menghapus unit.');
+      }
+    }
+
+    // =========================================================
+    // MODAL INPUT / REVISI / PRINT SURAT JALAN
+    // =========================================================
     function generateAutoNumber() {
       const now = new Date();
       const prefix = `SJMHE-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-`;
@@ -1068,8 +1738,10 @@
     }
 
     function openFormModal() {
+      currentEditingTx = null;
       document.getElementById('txForm').reset();
       document.getElementById('rowIndex').value = '';
+      document.getElementById('btnDeleteTxInModal').classList.add('d-none');
       document.getElementById('currentPdfNotice').innerText = 'Otomatis tersimpan ke Kolom M (PDF Pengiriman) atau Kolom N (PDF Penerimaan).';
       document.getElementById('checker').value = currentUser.nama;
       document.getElementById('modalTitle').innerText = 'Input Transaksi SJMHE Baru';
@@ -1097,12 +1769,13 @@
     }
 
     function openEditModal(tx) {
+      currentEditingTx = tx;
       document.getElementById('rowIndex').value = tx.rowIndex;
       const savedPdf = (tx.status === 'Penerimaan') ? tx.pdfTerima : tx.pdfKirim;
       document.getElementById('currentPdfNotice').innerHTML = savedPdf
         ? `Dokumen tersimpan: <a href="${savedPdf}" target="_blank">Buka PDF Saat Ini</a> (pilih file baru jika ingin mengganti).`
         : 'Belum ada dokumen PDF terlampir untuk status ini.';
-      document.getElementById('modalTitle').innerText = `Revisi / Upload PDF: ${tx.noSjmhe}`;
+      document.getElementById('modalTitle').innerText = `Revisi / Upload PDF: ${tx.noSjmhe} (${tx.status})`;
       document.getElementById('noSjmhe').value = tx.noSjmhe;
       document.getElementById('status').value = tx.status;
       document.getElementById('pengirim').value = tx.pengirim;
@@ -1114,6 +1787,10 @@
       document.getElementById('checker').value = tx.checker;
       document.getElementById('driverInfo').value = tx.driverInfo;
       document.getElementById('keterangan').value = tx.keterangan;
+
+      if (currentUser.role === 'ADMIN') {
+        document.getElementById('btnDeleteTxInModal').classList.remove('d-none');
+      }
       filterAvailableUnits();
       txModalObj.show();
     }
