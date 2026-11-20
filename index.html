@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MHE Logistics Control & Summary Portal</title>
+  <title>MHE Logistics Control & Summary Portal - SCG Barito Logistics</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -49,11 +49,9 @@
   <div id="loginScreen" class="login-wrapper px-3">
     <div class="card login-card p-4 bg-white">
       <div class="text-center mb-4">
-        <div class="bg-dark text-warning d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px;">
-          <i class="bi bi-shield-lock-fill fs-2"></i>
-        </div>
+        <img src="logo-scg.png" alt="SCG Barito Logistics" class="mb-3" style="max-height: 64px; object-fit: contain;" onerror="this.style.display='none'">
         <h4 class="fw-bold mb-1">MHE LOGISTICS PORTAL</h4>
-        <p class="text-muted small mb-0">Warehouse Asset Control & Surat Jalan System</p>
+        <p class="text-muted small mb-0">SCG Barito Logistics — Asset Control & Surat Jalan</p>
       </div>
       <form onsubmit="handleLogin(event)">
         <div class="mb-3">
@@ -85,7 +83,7 @@
       <div class="container-fluid px-4">
         <div class="d-flex align-items-center gap-3">
           <span class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0">
-            <i class="bi bi-box-seam-fill text-warning fs-4"></i>
+            <img src="logo-scg.png" alt="SCG Barito Logistics" class="bg-white rounded px-2 py-1" style="height: 36px; object-fit: contain;" onerror="this.style.display='none'">
             <span>MHE CONTROL & SURAT JALAN</span>
           </span>
           <span class="badge bg-dark border border-secondary text-light d-none d-md-inline" id="liveClock"></span>
@@ -719,9 +717,12 @@
           <div id="printArea">
             <div class="sj-box">
               <div class="d-flex justify-content-between align-items-center border-bottom border-2 border-dark pb-3 mb-3">
-                <div>
-                  <h4 class="fw-bold mb-0">SURAT JALAN MUTASI MHE</h4>
-                  <p class="mb-0 small">WAREHOUSE & LOGISTICS OPERATIONS</p>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="logo-scg.png" alt="SCG Barito Logistics" style="height: 48px; object-fit: contain;" onerror="this.style.display='none'">
+                  <div>
+                    <h4 class="fw-bold mb-0">SURAT JALAN MUTASI MHE</h4>
+                    <p class="mb-0 small fw-semibold">SCG BARITO LOGISTICS — WAREHOUSE OPERATIONS</p>
+                  </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
                   <div class="text-end">
